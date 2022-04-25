@@ -3,6 +3,7 @@
 body {
   margin: 0;
   font-family: 'Fira Sans', sans-serif;
+  color: #afafaf;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

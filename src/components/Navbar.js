@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles/Navbar.css";
 import AccountMenu from "./AccountMenu";
@@ -13,6 +13,10 @@ const myGray = "#afafaf";
 function Navbar() {
   const [page, setPage] = useState("learn");
 
+  useEffect(() => {
+    setPage(window.location.pathname.substring(1));
+  }, []);
+  
   return (
     <nav>
       <span className="nav-logo">Fakelingo</span>
@@ -23,7 +27,7 @@ function Navbar() {
           &nbsp;&nbsp;
           <span style={{ color: page === "learn" ? myBlue : myGray }}>Học</span>
         </Link>
-        
+
         <Link to="/dictionary" onClick={() => setPage("dictionary")}>
           <img src={page === "dictionary" ? focusDictIcon2 : dictIcon} alt="" />
           &nbsp;&nbsp;

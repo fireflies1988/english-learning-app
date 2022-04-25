@@ -1,4 +1,9 @@
 nav {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 0;
+  background-color: white;
+  z-index: 1;
   height: 60px;
   border-bottom: 2px solid #e5e5e5;
   font-size: larger;
@@ -49,5 +54,11 @@ nav .nav-account {
   -webkit-box-flex: 1;
       -ms-flex: 1;
           flex: 1;
+}
+
+nav .nav-account > div {
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
 }
 /*# sourceMappingURL=Navbar.css.map */

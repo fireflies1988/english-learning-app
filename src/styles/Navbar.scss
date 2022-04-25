@@ -1,8 +1,12 @@
 @import "./variables.scss";
 
 nav {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
     height: 60px;
-    border-bottom: 2px solid #e5e5e5;
+    border-bottom: 2px solid $myBorderColor;
     font-size: larger;
     font-weight: bold;
     display: flex;
@@ -30,5 +34,9 @@ nav {
 
     .nav-account {
         flex: 1;
+
+        > div {
+            justify-content: flex-end;   
+        }
     }
 }

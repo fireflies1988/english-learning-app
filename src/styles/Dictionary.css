@@ -1,0 +1,46 @@
+.dictionary {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.dictionary form {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+  gap: 1rem;
+}
+
+.dictionary h2, .dictionary h3 {
+  color: #4b4b4b;
+}
+
+.dictionary .phonetics {
+  border-bottom: 2px solid #e5e5e5;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.dictionary .result {
+  width: 40vw;
+}
+
+.dictionary .result .meaning {
+  padding: 1.75rem 0;
+  border-bottom: 2px solid #e5e5e5;
+}
+/*# sourceMappingURL=Dictionary.css.map */
