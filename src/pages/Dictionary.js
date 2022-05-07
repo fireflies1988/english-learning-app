@@ -4,15 +4,17 @@ import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import IconButton from "@mui/material/IconButton";
 import { useState } from "react";
 import axios from "axios";
-import Button from "@mui/material/Button";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 function Dictionary() {
   const [word, setWord] = useState("");
   const [data, setData] = useState([]);
   const [audio, setAudio] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function dictionaryApi() {
+    setLoading(() => true);
     try {
       const response1 = await axios.get(
         `https://salty-earth-78071.herokuapp.com/meaning/?word=${word}`
@@ -26,6 +28,7 @@ function Dictionary() {
     } catch (error) {
       console.log(error);
     }
+    setLoading(() => false);
   }
 
   function handleSubmit(event) {
@@ -53,9 +56,16 @@ function Dictionary() {
           onChange={(event) => setWord(event.target.value)}
         />
 
-        <Button variant="contained" color="success" type="submit">
+        <LoadingButton
+          loading={loading}
+          loadingPosition="start"
+          variant="contained"
+          color="success"
+          type="submit"
+          style={{ width: "130px" }}
+        >
           Tìm kiếm
-        </Button>
+        </LoadingButton>
       </form>
 
       {data.length > 0 && (
@@ -84,7 +94,7 @@ function Dictionary() {
               data[0].meanings.map((meaning) => (
                 <div className="meaning" key={meaning.id}>
                   <div>
-                    <b>Danh từ</b>
+                    <b>{meaning.typeid.name}</b>
                   </div>
                   {meaning.mean}
                 </div>

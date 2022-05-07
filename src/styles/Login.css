@@ -1,0 +1,54 @@
+.container {
+  background: url("../images/pexels-pixabay-40896.jpg") no-repeat center;
+  background-size: cover;
+  height: 100vh;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.container form {
+  width: 80%;
+  max-width: 350px;
+  height: auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 2rem;
+}
+
+.container form .title {
+  text-align: center;
+  color: #08b335;
+  margin-bottom: 2rem;
+}
+
+.container form .error-text {
+  text-align: right;
+  font-size: small;
+  font-weight: bold;
+}
+
+.container form .register {
+  margin-top: 0.75rem;
+  color: grey;
+  text-align: center;
+}
+
+.container form .register a {
+  color: #4b4b4b;
+}
+
+.container form .register a:link, .container form .register a:visited {
+  text-decoration: none;
+}
+
+.container form .register a:hover {
+  color: #0bb02f;
+}
+/*# sourceMappingURL=Login.css.map */

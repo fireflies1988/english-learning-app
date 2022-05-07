@@ -9,16 +9,33 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
+import AuthContext from '../context/AuthProvider';
+import { useContext } from 'react';
 
 export default function AccountMenu() {
+  const { setAuth } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  function handleLogout() {
+    let temp = {
+      email: null,
+      password: null,
+      accessToken: null,
+      tokenType: null,
+      loggedIn: false
+    };
+    localStorage.setItem("auth", JSON.stringify(temp));
+    setAuth(temp);
+  }
+
   return (
     <React.Fragment>
       <Box sx={{ display: 'flex', alignItems: 'center', textAlign: 'center' }}>
@@ -80,7 +97,7 @@ export default function AccountMenu() {
           </ListItemIcon>
           Cài đặt
         </MenuItem>
-        <MenuItem>
+        <MenuItem onClick={handleLogout}>
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
