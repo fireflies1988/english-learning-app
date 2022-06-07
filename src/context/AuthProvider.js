@@ -6,8 +6,6 @@ const AuthContext = createContext({});
 // { children } only get children property in props (props.children)
 export function AuthProvider({ children }) {
   const [auth, setAuth] = useState({
-    email: null,
-    password: null,
     accessToken: null,
     tokenType: null,
     loggedIn: false

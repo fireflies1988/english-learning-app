@@ -1,50 +1,41 @@
-import React, { useContext, useEffect } from "react";
-import { useState } from "react";
-import "../styles/Login.css";
-import { Link, useLocation } from "react-router-dom";
-import {
-  TextField,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-  FormHelperText,
-  Alert,
-} from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import axios from "axios";
-import AuthContext from "../context/AuthProvider";
 import LoadingButton from "@mui/lab/LoadingButton";
-import { createBrowserHistory } from "history";
+import {
+  Alert,
+  FormControl,
+  FormHelperText,
+  IconButton,
+  InputAdornment,
+  InputLabel,
+  OutlinedInput,
+  TextField,
+} from "@mui/material";
+import axios from "axios";
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-function Login() {
-  const history = createBrowserHistory();
-  const location = useLocation();
-  const { setAuth } = useContext(AuthContext);
-  const [credentials, setCredentials] = useState({
-    email: location.state?.email,
-    password: location.state?.password,
+function Register() {
+  const navigate = useNavigate();
+  const [data, setData] = useState({
+    email: "",
+    password: "",
+    firstName: "",
+    lastName: "",
   });
   const [state, setState] = useState({
     showPassword: false,
     emailErrorText: "",
     passwordErrorText: "",
+    firstNameErrorText: "",
+    lastNameErrorText: "",
     errorMessage: "",
-    successMessage: location.state?.message,
     isLoading: false,
   });
 
-  useEffect(() => {
-    if (location.state) {
-      history.replace(location.state, null);
-    }
-  }, [])
-
   function handleChange(event) {
     const { name, value } = event.target;
-    setCredentials({ ...credentials, [name]: value });
+    setData({ ...data, [name]: value });
   }
 
   function handleClickShowPassword() {
@@ -55,17 +46,20 @@ function Login() {
     event.preventDefault();
   };
 
-  async function login(email, password) {
+  async function register({ email, password, firstName, lastName }) {
     setState((state) => ({
       ...state,
       isLoading: true,
     }));
     try {
       const response = await axios.post(
-        "https://salty-earth-78071.herokuapp.com/user/login",
+        "https://salty-earth-78071.herokuapp.com/user/register",
         {
-          email,
-          password,
+          email: email,
+          password: password,
+          firstname: firstName,
+          lastname: lastName,
+          avatar: null,
         },
         {
           headers: { "Content-Type": "application/json " },
@@ -73,20 +67,18 @@ function Login() {
         }
       );
       console.log(response.data);
-      if (response.data.accessToken != null) {
-        const accessToken = response.data.accessToken;
-        const tokenType = response.data.tokenType;
-        let temp = {
-          accessToken: accessToken,
-          tokenType: tokenType,
-          loggedIn: true,
-        };
-        localStorage.setItem("auth", JSON.stringify(temp));
-        setAuth(temp);
+      if (response.data.code === 1) {
+        navigate("/login", {
+          state: {
+            email: email,
+            password: password,
+            message: "Đã đăng ký thành công, đăng nhập ngay"
+          }
+        });
       } else {
         setState((state) => ({
           ...state,
-          errorMessage: "Email hoặc mật khẩu không đúng!",
+          errorMessage: response.data.message,
         }));
       }
     } catch (err) {
@@ -104,12 +96,14 @@ function Login() {
       ...state,
       emailErrorText: "",
       passwordErrorText: "",
+      firstNameErrorText: "",
+      lastNameErrorText: "",
       errorMessage: "",
-      successMessage: ""
+      successMessage: "",
     }));
 
     let errors = 0;
-    if (!credentials.email) {
+    if (data.email === "") {
       setState((state) => ({
         ...state,
         emailErrorText: "Email không hợp lệ!",
@@ -117,7 +111,7 @@ function Login() {
       errors++;
     }
 
-    if (!credentials.password) {
+    if (data.password.trim().length === 0) {
       setState((state) => ({
         ...state,
         passwordErrorText: "Mật khẩu không được bỏ trống!",
@@ -125,8 +119,24 @@ function Login() {
       errors++;
     }
 
+    if (data.firstName.trim().length === 0) {
+      setState((state) => ({
+        ...state,
+        firstNameErrorText: "Tên không được bỏ trống!",
+      }));
+      errors++;
+    }
+
+    if (data.lastName.trim().length === 0) {
+      setState((state) => ({
+        ...state,
+        lastNameErrorText: "Họ không được bỏ trống!",
+      }));
+      errors++;
+    }
+
     if (errors === 0) {
-      login(credentials.email, credentials.password);
+      register(data);
     }
   }
 
@@ -140,11 +150,6 @@ function Login() {
             {state.errorMessage}
           </Alert>
         )}
-        {state.successMessage && (
-          <Alert variant="standard" severity="success">
-            {state.successMessage}
-          </Alert>
-        )}
 
         <TextField
           style={{ width: "100%", marginTop: "1rem" }}
@@ -152,7 +157,7 @@ function Login() {
           id="outlined-error-helper-text"
           label="Email"
           name="email"
-          value={credentials.email}
+          value={data.email}
           onChange={handleChange}
         />
         <FormHelperText error className="error-text">
@@ -172,7 +177,7 @@ function Login() {
             id="outlined-adornment-password"
             type={state.showPassword ? "text" : "password"}
             name="password"
-            value={credentials.password}
+            value={state.password}
             onChange={handleChange}
             endAdornment={
               <InputAdornment position="end">
@@ -193,6 +198,32 @@ function Login() {
           {state.passwordErrorText}
         </FormHelperText>
 
+        <TextField
+          style={{ width: "100%", marginTop: "1rem" }}
+          type="text"
+          id="outlined-error-helper-text"
+          label="Tên"
+          name="firstName"
+          value={data.firstName}
+          onChange={handleChange}
+        />
+        <FormHelperText error className="error-text">
+          {state.firstNameErrorText}
+        </FormHelperText>
+
+        <TextField
+          style={{ width: "100%", marginTop: "1rem" }}
+          type="text"
+          id="outlined-error-helper-text"
+          label="Họ"
+          name="lastName"
+          value={data.lastName}
+          onChange={handleChange}
+        />
+        <FormHelperText error className="error-text">
+          {state.lastNameErrorText}
+        </FormHelperText>
+
         <LoadingButton
           loading={state.isLoading}
           loadingPosition="start"
@@ -202,16 +233,16 @@ function Login() {
           size="large"
           type="submit"
         >
-          ĐĂNG NHẬP
+          ĐĂNG KÝ
         </LoadingButton>
 
         <div className="register">
-          <span>Chưa có tài khoản?</span>
-          <Link to="/register"> Đăng ký ngay</Link>
+          <span>Đã có tài khoản?</span>
+          <Link to="/login"> Đăng nhập</Link>
         </div>
       </form>
     </div>
   );
 }
 
-export default Login;
+export default Register;
