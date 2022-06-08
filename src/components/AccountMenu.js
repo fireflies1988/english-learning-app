@@ -11,8 +11,10 @@ import Settings from '@mui/icons-material/Settings';
 import Logout from '@mui/icons-material/Logout';
 import AuthContext from '../context/AuthProvider';
 import { useContext } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function AccountMenu() {
+  const navigate = useNavigate();
   const { setAuth } = useContext(AuthContext);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
@@ -91,7 +93,7 @@ export default function AccountMenu() {
           <Avatar /> Hồ sơ
         </MenuItem>
         <Divider />
-        <MenuItem>
+        <MenuItem onClick={() => navigate("settings/profile")}>
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>

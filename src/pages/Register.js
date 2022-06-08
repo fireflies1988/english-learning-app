@@ -62,7 +62,7 @@ function Register() {
           avatar: null,
         },
         {
-          headers: { "Content-Type": "application/json " },
+          headers: { "Content-Type": "application/json" },
           // withCredentials: true
         }
       );

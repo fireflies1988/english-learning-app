@@ -1,0 +1,50 @@
+@import "./variables.scss";
+
+.settings-container {
+    max-width: 1920px;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+
+    .vertical-tabs {
+        width: 20%;
+        padding: 1rem;
+        border: 2px solid $myBorderColor;
+        border-radius: 16px;
+
+        .tab {
+            display: block;
+            border: none;
+            background: none;
+            color: #816b6b;
+            font-weight: bold;
+            text-align: left;
+            font-size: 1rem;
+            padding: 0.5rem;
+            width: 100%;
+            &.active {
+                background-color: #dadada;
+            }
+        }
+    }
+
+    .tab-content {
+        width: 80%;
+        padding: 0 1rem 1rem 1rem;
+    }
+}
+
+@media screen and (max-width: 600px) {
+    .settings-container {
+        flex-direction: column;
+
+        .vertical-tabs {
+            width: 100%;
+        }
+
+        .tab-content {
+            margin-top: 1rem;
+            width: 100%;
+        }
+    }
+}

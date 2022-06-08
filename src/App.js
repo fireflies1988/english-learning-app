@@ -12,17 +12,22 @@ import Login from "./pages/Login";
 import AuthContext from "./context/AuthProvider";
 import { useContext, useEffect, useMemo } from "react";
 import Register from "./pages/Register";
+import Settings from "./pages/Settings";
+import Profile from "./pages/Profile";
+import Password from "./pages/Password";
 
 function App() {
   const { auth, setAuth } = useContext(AuthContext);
-  const loggedIn =  useMemo(() => JSON.parse(localStorage.getItem("auth"))?.loggedIn);
+  const loggedIn = useMemo(
+    () => JSON.parse(localStorage.getItem("auth"))?.loggedIn
+  );
 
   useEffect(() => {
     let temp = localStorage.getItem("auth");
     if (temp != null) {
       setAuth(JSON.parse(temp));
     }
-  }, [])
+  }, []);
   console.log(auth);
 
   return (
@@ -31,18 +36,23 @@ function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="*" element={<Navigate to="/login" />}/>
+          <Route path="*" element={<Navigate to="/login" />} />
         </Routes>
       ) : (
-        <>
-          <Navbar />
-
-          <Routes>
-            <Route path="/learn" element={<Learn />} />
-            <Route path="/dictionary" element={<Dictionary />} />
-            <Route path="*" element={<Navigate to="/learn" />} />
-          </Routes>
-        </>
+        <Routes>
+          <Route path="/" element={<Navbar />}>
+            <Route index element={<Learn />} />
+            <Route path="learn" element={<Learn />} />
+            <Route path="dictionary" element={<Dictionary />} />
+            <Route path="settings" element={<Settings />}>
+              <Route index element={<Profile />} />
+              <Route path="profile" element={<Profile />} />
+              <Route path="password" element={<Password />} />
+              <Route path="*" element={<Navigate to="profile" />} />
+            </Route>
+            <Route path="*" element={<Navigate to="learn" />} />
+          </Route>
+        </Routes>
       )}
     </Router>
   );

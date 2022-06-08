@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import "../styles/Navbar.css";
 import AccountMenu from "./AccountMenu";
 import learnIcon from "../icons/book_32.png";
@@ -11,36 +11,51 @@ const myBlue = "#1cb0f6";
 const myGray = "#afafaf";
 
 function Navbar() {
+  const location = useLocation();
   const [page, setPage] = useState("learn");
 
   useEffect(() => {
-    setPage(window.location.pathname.substring(1));
-  }, []);
-  
+    if (location.pathname.substring(1) === "") {
+      setPage("learn");
+    } else {
+      setPage(location.pathname.substring(1));
+    }
+  }, [location]);
+
   return (
-    <nav>
-      <span className="nav-logo">Fakelingo</span>
+    <>
+      <nav>
+        <span className="nav-logo">Fakelingo</span>
 
-      <div className="nav-link">
-        <Link to="/learn" onClick={() => setPage("learn")}>
-          <img src={page === "learn" ? focusLearnIcon : learnIcon} alt="" />
-          &nbsp;&nbsp;
-          <span style={{ color: page === "learn" ? myBlue : myGray }}>Học</span>
-        </Link>
+        <div className="nav-link">
+          <Link to="/learn" onClick={() => setPage("learn")}>
+            <img src={page === "learn" ? focusLearnIcon : learnIcon} alt="" />
+            &nbsp;&nbsp;
+            <span style={{ color: page === "learn" ? myBlue : myGray }}>
+              Học
+            </span>
+          </Link>
 
-        <Link to="/dictionary" onClick={() => setPage("dictionary")}>
-          <img src={page === "dictionary" ? focusDictIcon2 : dictIcon} alt="" />
-          &nbsp;&nbsp;
-          <span style={{ color: page === "dictionary" ? myBlue : myGray }}>
-            Từ điển
-          </span>
-        </Link>
-      </div>
+          <Link to="/dictionary" onClick={() => setPage("dictionary")}>
+            <img
+              src={page === "dictionary" ? focusDictIcon2 : dictIcon}
+              alt=""
+            />
+            &nbsp;&nbsp;
+            <span style={{ color: page === "dictionary" ? myBlue : myGray }}>
+              Từ điển
+            </span>
+          </Link>
+        </div>
 
-      <div className="nav-account">
-        <AccountMenu />
-      </div>
-    </nav>
+        <div className="nav-account">
+          <AccountMenu />
+        </div>
+      </nav>
+      
+      {/* render the current route selected here */}
+      <Outlet />
+    </>
   );
 }
 
