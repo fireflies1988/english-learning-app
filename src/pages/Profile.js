@@ -1,12 +1,20 @@
 import LoadingButton from "@mui/lab/LoadingButton";
-import { Alert, Button, CircularProgress, FormHelperText, TextField } from "@mui/material";
+import "../styles/Profile.css";
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  FormHelperText,
+  TextField,
+} from "@mui/material";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
 import AuthContext from "../context/AuthProvider";
-import "../styles/Profile.css";
+import SaveIcon from "@mui/icons-material/Save";
 
 function Profile() {
   const { auth } = useContext(AuthContext);
+  const [initialData, setInitialData] = useState({});
   const [data, setData] = useState({
     email: "",
     firstName: "",
@@ -19,6 +27,7 @@ function Profile() {
     errorMessage: "",
     successMessage: "",
     isLoading: true,
+    isUpdating: false,
   });
 
   async function fetchUserInfo() {
@@ -32,31 +41,117 @@ function Profile() {
           },
         }
       );
-      console.log(response.data);
-      setData({
+      setData(() => ({
         email: response.data.email,
         firstName: response.data.firstname,
         lastName: response.data.lastname,
-      });
-      setState((state) => ({
-        ...state,
-        isLoading: false,
+        avatar: response.data.avatar,
       }));
+      setInitialData(() => ({...data}));
     } catch (err) {
       setState((state) => ({
         ...state,
         errorMessage: err,
       }));
     }
+    setState((state) => ({
+      ...state,
+      isLoading: false,
+    }));
+  }
+
+  async function updateUserInfo({ firstName, lastName, avatar }) {
+    setState((state) => ({
+      ...state,
+      isUpdating: true,
+      successMessage: "",
+      errorMessage: "",
+    }));
+    try {
+      const response = await axios.post(
+        "https://salty-earth-78071.herokuapp.com/user/update",
+        {
+          firstname: firstName,
+          lastname: lastName,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: auth.tokenType + " " + auth.accessToken,
+          },
+        }
+      );
+      setData(() => ({
+        email: response.data.result.email,
+        firstName: response.data.result.firstname,
+        lastName: response.data.result.lastname,
+        avatar: response.data.result.avatar,
+      }));
+      setInitialData(() => ({...data}));
+      setState((state) => ({
+        ...state,
+        isUpdating: false,
+        successMessage: "Cập nhật hồ sơ thành công",
+      }));
+    } catch (err) {
+      setState((state) => ({
+        ...state,
+        errorMessage: err,
+        isUpdating: false,
+      }));
+    }
   }
 
   useEffect(() => {
-    fetchUserInfo();
-  }, []);
+    if (auth.accessToken) {
+      fetchUserInfo();
+    }
+  }, [auth]);
 
   function handleChange(event) {
     const { name, value } = event.target;
     setData({ ...data, [name]: value });
+  }
+
+  function handleSubmit(event) {
+    event.preventDefault();
+    setState((state) => ({
+      ...state,
+      firstNameErrorText: "",
+      lastNameErrorText: "",
+      errorMessage: "",
+      successMessage: "",
+    }));
+
+    let errors = 0;
+    if (!data.firstName.trim()) {
+      setState((state) => ({
+        ...state,
+        firstNameErrorText: "Tên không được bỏ trống!",
+      }));
+      errors++;
+    }
+
+    if (!data.lastName.trim()) {
+      setState((state) => ({
+        ...state,
+        lastNameErrorText: "Họ không được bỏ trống!",
+      }));
+      errors++;
+    }
+
+    if (errors === 0) {
+      updateUserInfo(data);
+    }
+  }
+
+  function handleCancel(event) {
+    setState((state) => ({
+      ...state,
+      successMessage: "",
+      errorMessage: "",
+    }));
+    setData(initialData);
   }
 
   return (
@@ -77,7 +172,7 @@ function Profile() {
       {state.isLoading ? (
         <CircularProgress color="success" />
       ) : (
-        <>
+        <form onSubmit={handleSubmit}>
           <TextField
             style={{ width: "100%", marginTop: "1rem" }}
             type="email"
@@ -86,6 +181,7 @@ function Profile() {
             name="email"
             value={data.email}
             onChange={handleChange}
+            disabled
           />
 
           <TextField
@@ -97,7 +193,14 @@ function Profile() {
             value={data.firstName}
             onChange={handleChange}
           />
-          <FormHelperText error className="error-text">
+          <FormHelperText
+            error
+            style={{
+              textAlign: "right",
+              fontSize: "small",
+              fontWeight: "bold",
+            }}
+          >
             {state.firstNameErrorText}
           </FormHelperText>
 
@@ -110,16 +213,24 @@ function Profile() {
             value={data.lastName}
             onChange={handleChange}
           />
-          <FormHelperText error className="error-text">
+          <FormHelperText
+            error
+            style={{
+              textAlign: "right",
+              fontSize: "small",
+              fontWeight: "bold",
+            }}
+          >
             {state.lastNameErrorText}
           </FormHelperText>
 
           <LoadingButton
-            loading={state.isLoading}
+            loading={state.isUpdating}
             loadingPosition="start"
             variant="contained"
             style={{ marginTop: "2rem", marginRight: "1rem" }}
             color="success"
+            startIcon={<SaveIcon />}
             type="submit"
           >
             Lưu thay đổi
@@ -129,10 +240,11 @@ function Profile() {
             variant="outlined"
             color="success"
             style={{ marginTop: "2rem" }}
+            onClick={handleCancel}
           >
             Hủy
           </Button>
-        </>
+        </form>
       )}
     </>
   );

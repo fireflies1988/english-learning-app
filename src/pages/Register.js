@@ -66,7 +66,6 @@ function Register() {
           // withCredentials: true
         }
       );
-      console.log(response.data);
       if (response.data.code === 1) {
         navigate("/login", {
           state: {
@@ -103,7 +102,7 @@ function Register() {
     }));
 
     let errors = 0;
-    if (data.email === "") {
+    if (!data.email) {
       setState((state) => ({
         ...state,
         emailErrorText: "Email không hợp lệ!",
@@ -111,7 +110,7 @@ function Register() {
       errors++;
     }
 
-    if (data.password.trim().length === 0) {
+    if (!data.password) {
       setState((state) => ({
         ...state,
         passwordErrorText: "Mật khẩu không được bỏ trống!",
@@ -119,7 +118,7 @@ function Register() {
       errors++;
     }
 
-    if (data.firstName.trim().length === 0) {
+    if (!data.firstName.trim()) {
       setState((state) => ({
         ...state,
         firstNameErrorText: "Tên không được bỏ trống!",
@@ -127,7 +126,7 @@ function Register() {
       errors++;
     }
 
-    if (data.lastName.trim().length === 0) {
+    if (!data.lastName.trim()) {
       setState((state) => ({
         ...state,
         lastNameErrorText: "Họ không được bỏ trống!",

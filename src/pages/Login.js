@@ -72,7 +72,6 @@ function Login() {
           // withCredentials: true
         }
       );
-      console.log(response.data);
       if (response.data.accessToken != null) {
         const accessToken = response.data.accessToken;
         const tokenType = response.data.tokenType;
