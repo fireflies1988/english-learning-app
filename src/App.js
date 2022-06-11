@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Password from "./pages/Password";
+import Test from "./pages/Test";
 
 function App() {
   const { auth, setAuth } = useContext(AuthContext);
@@ -40,6 +41,7 @@ function App() {
         </Routes>
       ) : (
         <Routes>
+          <Route path="learn/:setId" element={<Test />} />
           <Route path="/" element={<Navbar />}>
             <Route index element={<Learn />} />
             <Route path="learn" element={<Learn />} />

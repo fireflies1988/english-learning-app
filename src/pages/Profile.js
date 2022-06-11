@@ -28,6 +28,7 @@ function Profile() {
     successMessage: "",
     isLoading: true,
     isUpdating: false,
+    loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
   });
 
   async function fetchUserInfo() {
@@ -47,11 +48,11 @@ function Profile() {
         lastName: response.data.lastname,
         avatar: response.data.avatar,
       }));
-      setInitialData(() => ({...data}));
+      setInitialData(() => ({ ...data }));
     } catch (err) {
       setState((state) => ({
         ...state,
-        errorMessage: err,
+        errorMessage: "Đã có lỗi xảy ra, vui lòng thử lại sau!\n" + err,
       }));
     }
     setState((state) => ({
@@ -87,7 +88,7 @@ function Profile() {
         lastName: response.data.result.lastname,
         avatar: response.data.result.avatar,
       }));
-      setInitialData(() => ({...data}));
+      setInitialData(() => ({ ...data }));
       setState((state) => ({
         ...state,
         isUpdating: false,
@@ -170,7 +171,10 @@ function Profile() {
       )}
 
       {state.isLoading ? (
-        <CircularProgress color="success" />
+        <>
+          <CircularProgress color="success" />
+          <h5>{state.loadingText}</h5>
+        </>
       ) : (
         <form onSubmit={handleSubmit}>
           <TextField
