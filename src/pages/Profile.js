@@ -151,6 +151,8 @@ function Profile() {
       ...state,
       successMessage: "",
       errorMessage: "",
+      firstNameErrorText: "",
+      lastNameErrorText: ""
     }));
     setData(initialData);
   }
@@ -173,7 +175,7 @@ function Profile() {
       {state.isLoading ? (
         <>
           <CircularProgress color="success" />
-          <h5>{state.loadingText}</h5>
+          <h4>{state.loadingText}</h4>
         </>
       ) : (
         <form onSubmit={handleSubmit}>
@@ -236,6 +238,7 @@ function Profile() {
             color="success"
             startIcon={<SaveIcon />}
             type="submit"
+            className="my-font"
           >
             Lưu thay đổi
           </LoadingButton>
@@ -245,6 +248,7 @@ function Profile() {
             color="success"
             style={{ marginTop: "2rem" }}
             onClick={handleCancel}
+            className="my-font"
           >
             Hủy
           </Button>

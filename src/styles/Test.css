@@ -1,0 +1,93 @@
+footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border-top: 2px solid #e5e5e5;
+  height: 70px;
+  background-color: white;
+}
+
+main {
+  margin: 1.5rem 0.5rem 120px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+main section {
+  width: 100%;
+  max-width: 550px;
+}
+
+main section .question {
+  margin-top: 3rem;
+  margin-bottom: 5rem;
+  color: black;
+}
+
+main section.multiple-choice-question .options {
+  width: 100%;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  gap: 12px;
+}
+
+main section.multiple-choice-question .options .option {
+  border-radius: 10px !important;
+  width: 100%;
+  text-transform: none;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+main section.listening-question .question {
+  margin-bottom: 3rem;
+}
+
+main section.listening-question .speaker {
+  -webkit-transform: scale(3.5);
+          transform: scale(3.5);
+}
+
+main section.arranging-question .question {
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+main section.arranging-question img {
+  width: 100%;
+}
+
+main section.arranging-question .your-answer {
+  margin-top: 0.25rem;
+  height: 150px;
+  border: 2px solid #e5e5e5;
+  border-radius: 1rem;
+}
+
+main section.arranging-question .word-picking {
+  width: 100%;
+  margin-top: 0.75rem;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  gap: 8px;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+
+main section.arranging-question .word-picking button {
+  text-transform: none;
+  border-radius: 12px;
+}
+
+@media screen and (min-width: 600px) {
+  footer {
+    height: 100px;
+  }
+}
+/*# sourceMappingURL=Test.css.map */

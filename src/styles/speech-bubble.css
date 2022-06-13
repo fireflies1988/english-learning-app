@@ -1,0 +1,76 @@
+/** Speech bubble */
+.speech-bubble {
+  background: #efefef;
+  border-radius: 10px;
+  line-height: 1.3;
+  margin: 0 auto 25px;
+  width: 100%;
+  padding: 15px;
+  position: relative;
+}
+
+.speech-bubble p {
+  margin: 0 0 10px;
+}
+
+.speech-bubble p :last-of-type {
+  margin-bottom: 0;
+}
+
+.speech-bubble::after {
+  border-right: 20px solid transparent;
+  border-top: 20px solid #efefef;
+  bottom: -20px;
+  content: "";
+  position: absolute;
+}
+
+/** Speech bubble with drop shadow and border */
+.speech-bubble-ds {
+  background: #efefef;
+  border: 1px solid #a7a7a7;
+  border-radius: 4px;
+  -webkit-box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+          box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.2);
+  font-size: 1.2rem;
+  line-height: 1.3;
+  margin: 0 auto 40px;
+  max-width: 400px;
+  padding: 15px;
+  position: relative;
+}
+
+.speech-bubble-ds p {
+  margin-bottom: 10px;
+}
+
+.speech-bubble-ds p :last-of-type {
+  margin-bottom: 0;
+}
+
+.speech-bubble-ds__arrow {
+  border-left: 21px solid transparent;
+  border-top: 20px solid rgba(0, 0, 0, 0.2);
+  bottom: -25px;
+  position: absolute;
+  right: 15px;
+}
+
+.speech-bubble-ds__arrow::before {
+  border-left: 23px solid transparent;
+  border-top: 23px solid #a7a7a7;
+  bottom: 2px;
+  content: "";
+  position: absolute;
+  right: 5px;
+}
+
+.speech-bubble-ds__arrow::after {
+  border-left: 21px solid transparent;
+  border-top: 21px solid #efefef;
+  bottom: 4px;
+  content: "";
+  position: absolute;
+  right: 6px;
+}
+/*# sourceMappingURL=speech-bubble.css.map */

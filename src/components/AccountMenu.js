@@ -89,17 +89,17 @@ export default function AccountMenu() {
         transformOrigin={{ horizontal: 'right', vertical: 'top' }}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
       >
-        <MenuItem>
+        <MenuItem className="my-font">
           <Avatar /> Hồ sơ
         </MenuItem>
         <Divider />
-        <MenuItem onClick={() => navigate("settings/profile")}>
+        <MenuItem onClick={() => navigate("settings/profile")} className="my-font">
           <ListItemIcon>
             <Settings fontSize="small" />
           </ListItemIcon>
           Cài đặt
         </MenuItem>
-        <MenuItem onClick={handleLogout}>
+        <MenuItem onClick={handleLogout} className="my-font">
           <ListItemIcon>
             <Logout fontSize="small" />
           </ListItemIcon>
