@@ -52,9 +52,25 @@ function Navbar() {
           <AccountMenu />
         </div>
       </nav>
-      
+
       {/* render the current route selected here */}
       <Outlet />
+
+      <footer class="bottom-nav">
+        <Link to="/learn" onClick={() => setPage("learn")}>
+          <img src={page === "learn" ? focusLearnIcon : learnIcon} alt="" />
+          &nbsp;&nbsp;
+          <span style={{ color: page === "learn" ? myBlue : myGray }}>Học</span>
+        </Link>
+
+        <Link to="/dictionary" onClick={() => setPage("dictionary")}>
+          <img src={page === "dictionary" ? focusDictIcon2 : dictIcon} alt="" />
+          &nbsp;&nbsp;
+          <span style={{ color: page === "dictionary" ? myBlue : myGray }}>
+            Từ điển
+          </span>
+        </Link>
+      </footer>
     </>
   );
 }

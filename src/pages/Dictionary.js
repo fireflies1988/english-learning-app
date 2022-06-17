@@ -59,6 +59,8 @@ function Dictionary() {
           variant="standard"
           style={{ width: "36vw" }}
           inputRef={inputWordRef}
+          inputProps={{className: "my-font"}}
+          InputLabelProps={{ className: "my-font" }}
         />
 
         <LoadingButton
@@ -68,6 +70,7 @@ function Dictionary() {
           color="success"
           type="submit"
           style={{ width: "130px" }}
+          className="my-font"
         >
           Tìm kiếm
         </LoadingButton>

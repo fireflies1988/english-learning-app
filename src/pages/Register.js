@@ -158,6 +158,8 @@ function Register() {
           name="email"
           value={data.email}
           onChange={handleChange}
+          inputProps={{ className: "my-font" }}
+          InputLabelProps={{ className: "my-font" }}
         />
         <FormHelperText error className="error-text">
           {state.emailErrorText}
@@ -168,7 +170,7 @@ function Register() {
           variant="outlined"
           style={{ width: "100%", marginTop: "1rem" }}
         >
-          <InputLabel htmlFor="outlined-adornment-password">
+          <InputLabel htmlFor="outlined-adornment-password" className="my-font">
             Mật khẩu
           </InputLabel>
           <OutlinedInput
@@ -178,6 +180,7 @@ function Register() {
             name="password"
             value={state.password}
             onChange={handleChange}
+            inputProps={{ className: "my-font" }}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -205,6 +208,8 @@ function Register() {
           name="firstName"
           value={data.firstName}
           onChange={handleChange}
+          inputProps={{ className: "my-font" }}
+          InputLabelProps={{ className: "my-font" }}
         />
         <FormHelperText error className="error-text">
           {state.firstNameErrorText}
@@ -218,6 +223,8 @@ function Register() {
           name="lastName"
           value={data.lastName}
           onChange={handleChange}
+          inputProps={{ className: "my-font" }}
+          InputLabelProps={{ className: "my-font" }}
         />
         <FormHelperText error className="error-text">
           {state.lastNameErrorText}
@@ -231,6 +238,7 @@ function Register() {
           color="success"
           size="large"
           type="submit"
+          className="my-font"
         >
           ĐĂNG KÝ
         </LoadingButton>

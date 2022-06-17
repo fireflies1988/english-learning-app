@@ -152,7 +152,7 @@ function Profile() {
       successMessage: "",
       errorMessage: "",
       firstNameErrorText: "",
-      lastNameErrorText: ""
+      lastNameErrorText: "",
     }));
     setData(initialData);
   }
@@ -187,6 +187,8 @@ function Profile() {
             name="email"
             value={data.email}
             onChange={handleChange}
+            inputProps={{ className: "my-font" }}
+            InputLabelProps={{ className: "my-font" }}
             disabled
           />
 
@@ -198,6 +200,8 @@ function Profile() {
             name="firstName"
             value={data.firstName}
             onChange={handleChange}
+            inputProps={{ className: "my-font" }}
+            InputLabelProps={{ className: "my-font" }}
           />
           <FormHelperText
             error
@@ -218,6 +222,8 @@ function Profile() {
             name="lastName"
             value={data.lastName}
             onChange={handleChange}
+            inputProps={{ className: "my-font" }}
+            InputLabelProps={{ className: "my-font" }}
           />
           <FormHelperText
             error

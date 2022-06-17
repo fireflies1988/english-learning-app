@@ -22,9 +22,10 @@ nav {
 
     .nav-link {
         flex: 3;
-        display: flex;
+        display: none;
         justify-content: center;
         gap: 3.5rem;
+
         a {
             text-decoration: none;
             display: flex;
@@ -38,5 +39,37 @@ nav {
         > div {
             justify-content: flex-end;   
         }
+    }
+}
+
+footer.bottom-nav {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    border-top: 2px solid $myBorderColor;
+    height: 60px;
+    background-color: white;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-evenly;
+
+    a {
+        display: flex;
+        align-items: center;
+        font-weight: bold;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    nav {
+        .nav-link {
+            display: flex;
+        }
+    }
+
+    footer.bottom-nav {
+        display: none;
     }
 }

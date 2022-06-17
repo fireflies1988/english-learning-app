@@ -17,13 +17,15 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { useEffect, useState } from "react";
+import React, { memo, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import "../styles/Test.css";
 import VolumeUpIcon from "@mui/icons-material/VolumeUp";
 import "../styles/speech-bubble.css";
 import axios from "axios";
+import { useSpeechSynthesis } from "react-speech-kit";
+import EmojiFlagsIcon from "@mui/icons-material/EmojiFlags";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 13,
@@ -38,18 +40,74 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   },
 }));
 
+const WordPicking = memo(
+  ({ currentQuestion, handleSelectWord, shuffledWords, setShuffledWords }) => {
+    function shuffleArray(array) {
+      console.log("shuffleArray is firing");
+      for (var i = array?.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+      }
+
+      return array;
+    }
+
+    const temp = useMemo(
+      () =>
+        shuffleArray(currentQuestion.answer?.split(/ +/))?.map(
+          (word, index) => ({
+            key: index,
+            value: word,
+            disabled: false,
+          })
+        ),
+      []
+    );
+
+    useEffect(() => {
+      setShuffledWords(temp);
+    }, [temp]);
+
+    return (
+      <div className="word-picking">
+        {currentQuestion.answer &&
+          shuffledWords.map((word) => (
+            <ToggleButton
+              key={word.key}
+              value={word.value}
+              disabled={word.disabled}
+              size="small"
+              className="my-font"
+              onClick={() => handleSelectWord(word)}
+            >
+              {word.value}
+            </ToggleButton>
+          ))}
+      </div>
+    );
+  }
+);
+
 function Test() {
   const { setId } = useParams();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const [view, setView] = useState("list");
-  const [selected, setSelected] = useState(false);
+  const [option, setOption] = useState();
   const [state, setState] = useState({
     isLoading: true,
     loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
     errorMessage: "",
   });
   const [questions, setQuestions] = useState();
+  const [currentQuestion, setCurrentQuestion] = useState();
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [pickedWords, setPickedWords] = useState([]);
+  const [shuffledWords, setShuffledWords] = useState([]);
+  const { speak } = useSpeechSynthesis();
+  // this state has one of four values: unanswered, correct, incorrect, completed
+  const [footerState, setFooterState] = useState("incorrect");
 
   async function fetchQuestions() {
     try {
@@ -61,7 +119,8 @@ function Test() {
           },
         }
       );
-      setQuestions(response.data.result);
+      setQuestions(() => response.data.result);
+      setCurrentQuestion(() => response.data.result[4]);
     } catch (err) {
       setState((state) => ({
         ...state,
@@ -78,9 +137,11 @@ function Test() {
     fetchQuestions();
   }, []);
 
-  const handleChange = (event, nextView) => {
-    setView(nextView);
+  /// multiple choice question
+  const handleChange = (event, option) => {
+    setOption(option);
   };
+  ///
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -90,16 +151,51 @@ function Test() {
     setOpen(false);
   };
 
+  /// arranging question
+  function handleSelectWord(word) {
+    // disable the button in the choosing section after clicking
+    setShuffledWords((shuffledWords) => [
+      ...shuffledWords.slice(0, word.key),
+      { ...shuffledWords[word.key], disabled: true },
+      ...shuffledWords.slice(word.key + 1),
+    ]);
+
+    // add the button to the answer section
+    setPickedWords((yourAnswer) => [...yourAnswer, word]);
+  }
+
+  function handleDeselectWord(word, index) {
+    // remove the button from the answer section after clicking
+    setPickedWords((yourAnswer) => [
+      ...yourAnswer.slice(0, index),
+      ...yourAnswer.slice(index + 1),
+    ]);
+
+    // enable the button in the choosing section after clicking
+    setShuffledWords((shuffledWords) => [
+      ...shuffledWords.slice(0, word.key),
+      { ...shuffledWords[word.key], disabled: false },
+      ...shuffledWords.slice(word.key + 1),
+    ]);
+  }
+  ///
+
   return (
     <Container maxWidth="md" style={{ marginTop: "2rem" }} className="my-font">
-      <div style={{ display: "flex", alignItems: "center" }}>
-        <IconButton aria-label="close" size="large" onClick={handleClickOpen}>
-          <CloseIcon fontSize="inherit" />
-        </IconButton>
-        <Box sx={{ flexGrow: 1 }}>
-          <BorderLinearProgress variant="determinate" value={0} style={{ marginRight: "12px" }} />
-        </Box>
-      </div>
+      {footerState !== "completed" && (
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <IconButton aria-label="close" size="large" onClick={handleClickOpen}>
+            <CloseIcon fontSize="inherit" />
+          </IconButton>
+          <Box sx={{ flexGrow: 1 }}>
+            <BorderLinearProgress
+              variant="determinate"
+              value={0}
+              style={{ marginRight: "12px" }}
+            />
+          </Box>
+        </div>
+      )}
 
       {state.errorMessage !== "" && (
         <Alert variant="standard" severity="error">
@@ -126,114 +222,270 @@ function Test() {
           {!state.errorMessage && (
             <>
               <main>
-                <section className="multiple-choice-question">
-                  <h2 className="question">This is the question content</h2>
-
-                  <ToggleButtonGroup
-                    orientation="vertical"
-                    value={view}
-                    exclusive
-                    onChange={handleChange}
-                    className="options"
-                  >
-                    <ToggleButton
-                      value="list"
-                      aria-label="list"
-                      className="option my-font"
+                {footerState !== "completed" ? (
+                  <>
+                    <section
+                      className="multiple-choice-question"
+                      hidden={currentQuestion.typeid.name !== "Reading"}
                     >
-                      Kiểm tra
-                    </ToggleButton>
-                    <ToggleButton
-                      value="module"
-                      aria-label="module"
-                      className="option my-font"
+                      <h2 className="question">
+                        {currentQuestion.questcontent}
+                      </h2>
+
+                      <ToggleButtonGroup
+                        orientation="vertical"
+                        value={option}
+                        exclusive
+                        onChange={handleChange}
+                        className="options"
+                      >
+                        <ToggleButton
+                          value="A"
+                          aria-label="A"
+                          className="option my-font"
+                        >
+                          {currentQuestion.a}
+                        </ToggleButton>
+                        <ToggleButton
+                          value="B"
+                          aria-label="B"
+                          className="option my-font"
+                        >
+                          {currentQuestion.b}
+                        </ToggleButton>
+                        <ToggleButton
+                          value="C"
+                          aria-label="C"
+                          className="option my-font"
+                        >
+                          {currentQuestion.c}
+                        </ToggleButton>
+                        <ToggleButton
+                          value="D"
+                          aria-label="D"
+                          className="option my-font"
+                        >
+                          {currentQuestion.d}
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                    </section>
+
+                    <section
+                      className="listening-question"
+                      hidden={currentQuestion.typeid.name !== "Listening"}
                     >
-                      Kiểm tra
-                    </ToggleButton>
-                    <ToggleButton
-                      value="quilt"
-                      aria-label="quilt"
-                      className="option my-font"
+                      <h2 className="question">
+                        Nhập lại nội dung bạn vừa nghe
+                      </h2>
+
+                      <div
+                        style={{ display: "flex", justifyContent: "center" }}
+                      >
+                        <IconButton
+                          aria-label="speaker"
+                          className="speaker"
+                          onClick={() =>
+                            speak({ text: currentQuestion.questcontent })
+                          }
+                        >
+                          <VolumeUpIcon />
+                        </IconButton>
+                      </div>
+
+                      <TextField
+                        id="outlined-basic"
+                        label="Nhập bằng tiếng anh"
+                        variant="outlined"
+                        multiline
+                        fullWidth
+                        rows={5}
+                        maxRows={5}
+                        style={{ marginTop: "3rem" }}
+                        inputProps={{ className: "my-font" }}
+                        InputLabelProps={{ className: "my-font" }}
+                      />
+                    </section>
+
+                    <section
+                      className="arranging-question"
+                      hidden={currentQuestion.typeid.name !== "Arrange"}
                     >
-                      Kiểm tra
-                    </ToggleButton>
-                  </ToggleButtonGroup>
-                </section>
-
-                <section className="listening-question" hidden>
-                  <h2 className="question">Nhập lại nội dung bạn vừa nghe</h2>
-
-                  <div style={{ display: "flex", justifyContent: "center" }}>
-                    <IconButton aria-label="speaker" className="speaker">
-                      <VolumeUpIcon />
-                    </IconButton>
-                  </div>
-
-                  <TextField
-                    id="outlined-basic"
-                    label="Nhập bằng tiếng anh"
-                    variant="outlined"
-                    multiline
-                    fullWidth
-                    rows={5}
-                    maxRows={5}
-                    style={{ marginTop: "3rem" }}
-                    inputProps={{ className: "my-font" }}
-                    InputLabelProps={{ className: "my-font" }}
-                  />
-                </section>
-
-                <section className="arranging-question" hidden>
-                  <h2 className="question">Viết lại bằng tiếng anh</h2>
-                  <div style={{ display: "flex", gap: "1rem" }}>
-                    <div style={{ maxWidth: "100px" }}>
-                      <img src={require("../icons/fox_512.png")} alt="" />
-                    </div>
-                    <div class="speech-bubble">
-                      <p>This is a simple CSS speech bubble.</p>
-                    </div>
-                  </div>
-                  <div className="your-answer"></div>
-                  <div className="word-picking">
-                    <ToggleButton
-                      value="check"
-                      size="small"
-                      disabled={selected}
-                      onChange={() => {
-                        setSelected(!selected);
+                      <h2 className="question">Viết lại bằng tiếng anh</h2>
+                      <div style={{ display: "flex", gap: "1rem" }}>
+                        <div style={{ maxWidth: "100px" }}>
+                          <img src={require("../icons/fox_512.png")} alt="" />
+                        </div>
+                        <div class="speech-bubble">
+                          <p>{currentQuestion.questcontent}</p>
+                        </div>
+                      </div>
+                      <div className="your-answer">
+                        {pickedWords.map((word, index) => (
+                          <ToggleButton
+                            key={word.key}
+                            value={word.value}
+                            aria-label={word.value}
+                            className="my-font"
+                            size="small"
+                            selected="true"
+                            onClick={() => handleDeselectWord(word, index)}
+                          >
+                            {word.value}
+                          </ToggleButton>
+                        ))}
+                      </div>
+                      <WordPicking
+                        currentQuestion={currentQuestion}
+                        handleSelectWord={handleSelectWord}
+                        shuffledWords={shuffledWords}
+                        setShuffledWords={setShuffledWords}
+                      />
+                    </section>
+                  </>
+                ) : (
+                  <section style={{ width: "unset" }}>
+                    <div
+                      style={{
+                        maxWidth: "400px",
+                        display: "flex",
+                        justifyContent: "center",
+                        height: "75vh",
+                        flexDirection: "column",
                       }}
                     >
-                      Word
-                    </ToggleButton>
-                  </div>
-                </section>
+                      <div style={{ maxWidth: "220px", margin: "0 auto" }}>
+                        <img
+                          src={require("../icons/badge_512.png")}
+                          alt=""
+                          style={{ width: "100%" }}
+                        />
+                      </div>
+
+                      <h2
+                        style={{
+                          textAlign: "center",
+                          color: "rgb(60, 60, 60)",
+                        }}
+                      >
+                        Xin chúc mừng bạn đã hoàn thành bài học
+                      </h2>
+                      <h3 style={{ textAlign: "center", color: "#ffc400" }}>
+                        Điểm của bạn: 10
+                      </h3>
+                    </div>
+                  </section>
+                )}
               </main>
 
-              <footer>
-                <Container
-                  maxWidth="md"
-                  style={{
-                    height: "100%",
-                    display: "flex",
-                    justifyContent: "space-around",
-                    alignItems: "center",
-                  }}
-                >
-                  <Button
-                    variant="outlined"
-                    color="success"
-                    className="my-font"
-                  >
-                    Bỏ qua
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="success"
-                    className="my-font"
-                  >
-                    Kiểm tra
-                  </Button>
-                </Container>
+              <footer
+                className="test-footer"
+                style={{
+                  backgroundColor:
+                    footerState === "unanswered"
+                      ? "white"
+                      : footerState === "incorrect"
+                      ? "#ffdfe0"
+                      : footerState === "correct"
+                      ? "#d7ffb8"
+                      : "white",
+                }}
+              >
+                {footerState === "unanswered" && (
+                  <Container maxWidth="md" className="f-container">
+                    <Button
+                      variant="outlined"
+                      color="success"
+                      className="my-font continue-button"
+                    >
+                      Bỏ qua
+                    </Button>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      className="my-font continue-button"
+                    >
+                      Kiểm tra
+                    </Button>
+                  </Container>
+                )}
+                {footerState === "incorrect" && (
+                  <Container maxWidth="md" className="f-container">
+                    <div className="content">
+                      <div className="image-content">
+                        <img
+                          src={require("../icons/incorrect_512.png")}
+                          alt=""
+                        />
+                      </div>
+
+                      <div className="answer-content">
+                        <div className="group-1">
+                          <h3>Đáp án đúng là:</h3>
+                          <div>The answer</div>
+                        </div>
+
+                        <Button
+                          variant="text"
+                          color="error"
+                          className="my-font"
+                        >
+                          <EmojiFlagsIcon />
+                          Báo cáo
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      variant="contained"
+                      color="error"
+                      className="my-font continue-button"
+                    >
+                      Tiếp tục
+                    </Button>
+                  </Container>
+                )}
+                {footerState === "correct" && (
+                  <Container maxWidth="md" className="f-container">
+                    <div className="content">
+                      <div className="image-content">
+                        <img src={require("../icons/correct_512.png")} alt="" />
+                      </div>
+
+                      <div className="answer-content">
+                        <div className="group-1" style={{ color: "#2e7d32" }}>
+                          <h3>Đúng rồi, giỏi lắm!</h3>
+                          <div>The answer</div>
+                        </div>
+
+                        <Button
+                          variant="text"
+                          color="success"
+                          className="my-font"
+                        >
+                          <EmojiFlagsIcon />
+                          Báo cáo
+                        </Button>
+                      </div>
+                    </div>
+                    <Button
+                      variant="contained"
+                      color="success"
+                      className="my-font continue-button"
+                    >
+                      Tiếp tục
+                    </Button>
+                  </Container>
+                )}
+                {footerState === "completed" && (
+                  <Container maxWidth="md" className="f-container">
+                    <Button
+                      variant="contained"
+                      color="success"
+                      className="my-font continue-button"
+                    >
+                      Tiếp tục
+                    </Button>
+                  </Container>
+                )}
               </footer>
             </>
           )}

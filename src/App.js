@@ -20,8 +20,7 @@ import Test from "./pages/Test";
 function App() {
   const { auth, setAuth } = useContext(AuthContext);
   const loggedIn = useMemo(
-    () => JSON.parse(localStorage.getItem("auth"))?.loggedIn
-  );
+    () => JSON.parse(localStorage.getItem("auth"))?.loggedIn);
 
   useEffect(() => {
     let temp = localStorage.getItem("auth");

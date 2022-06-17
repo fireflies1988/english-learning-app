@@ -40,7 +40,7 @@ function Login() {
     if (location.state) {
       history.replace(location.state, null);
     }
-  }, [])
+  }, []);
 
   function handleChange(event) {
     const { name, value } = event.target;
@@ -104,7 +104,7 @@ function Login() {
       emailErrorText: "",
       passwordErrorText: "",
       errorMessage: "",
-      successMessage: ""
+      successMessage: "",
     }));
 
     let errors = 0;
@@ -153,6 +153,8 @@ function Login() {
           name="email"
           value={credentials.email}
           onChange={handleChange}
+          inputProps={{ className: "my-font" }}
+          InputLabelProps={{ className: "my-font" }}
         />
         <FormHelperText error className="error-text">
           {state.emailErrorText}
@@ -163,7 +165,7 @@ function Login() {
           variant="outlined"
           style={{ width: "100%", marginTop: "1rem" }}
         >
-          <InputLabel htmlFor="outlined-adornment-password">
+          <InputLabel htmlFor="outlined-adornment-password" className="my-font">
             Mật khẩu
           </InputLabel>
           <OutlinedInput
@@ -173,6 +175,7 @@ function Login() {
             name="password"
             value={credentials.password}
             onChange={handleChange}
+            inputProps={{ className: "my-font" }}
             endAdornment={
               <InputAdornment position="end">
                 <IconButton
@@ -200,6 +203,7 @@ function Login() {
           color="success"
           size="large"
           type="submit"
+          className="my-font"
         >
           ĐĂNG NHẬP
         </LoadingButton>
