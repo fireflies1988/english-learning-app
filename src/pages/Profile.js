@@ -178,87 +178,91 @@ function Profile() {
           <h4>{state.loadingText}</h4>
         </>
       ) : (
-        <form onSubmit={handleSubmit}>
-          <TextField
-            style={{ width: "100%", marginTop: "1rem" }}
-            type="email"
-            id="outlined-error-helper-text"
-            label="Email"
-            name="email"
-            value={data.email}
-            onChange={handleChange}
-            inputProps={{ className: "my-font" }}
-            InputLabelProps={{ className: "my-font" }}
-            disabled
-          />
+        <>
+          {!state.errorMessage && (
+            <form onSubmit={handleSubmit}>
+              <TextField
+                style={{ width: "100%", marginTop: "1rem" }}
+                type="email"
+                id="outlined-error-helper-text"
+                label="Email"
+                name="email"
+                value={data.email}
+                onChange={handleChange}
+                inputProps={{ className: "my-font" }}
+                InputLabelProps={{ className: "my-font" }}
+                disabled
+              />
 
-          <TextField
-            style={{ width: "100%", marginTop: "1rem" }}
-            type="text"
-            id="outlined-error-helper-text"
-            label="Tên"
-            name="firstName"
-            value={data.firstName}
-            onChange={handleChange}
-            inputProps={{ className: "my-font" }}
-            InputLabelProps={{ className: "my-font" }}
-          />
-          <FormHelperText
-            error
-            style={{
-              textAlign: "right",
-              fontSize: "small",
-              fontWeight: "bold",
-            }}
-          >
-            {state.firstNameErrorText}
-          </FormHelperText>
+              <TextField
+                style={{ width: "100%", marginTop: "1rem" }}
+                type="text"
+                id="outlined-error-helper-text"
+                label="Tên"
+                name="firstName"
+                value={data.firstName}
+                onChange={handleChange}
+                inputProps={{ className: "my-font" }}
+                InputLabelProps={{ className: "my-font" }}
+              />
+              <FormHelperText
+                error
+                style={{
+                  textAlign: "right",
+                  fontSize: "small",
+                  fontWeight: "bold",
+                }}
+              >
+                {state.firstNameErrorText}
+              </FormHelperText>
 
-          <TextField
-            style={{ width: "100%", marginTop: "1rem" }}
-            type="text"
-            id="outlined-error-helper-text"
-            label="Họ"
-            name="lastName"
-            value={data.lastName}
-            onChange={handleChange}
-            inputProps={{ className: "my-font" }}
-            InputLabelProps={{ className: "my-font" }}
-          />
-          <FormHelperText
-            error
-            style={{
-              textAlign: "right",
-              fontSize: "small",
-              fontWeight: "bold",
-            }}
-          >
-            {state.lastNameErrorText}
-          </FormHelperText>
+              <TextField
+                style={{ width: "100%", marginTop: "1rem" }}
+                type="text"
+                id="outlined-error-helper-text"
+                label="Họ"
+                name="lastName"
+                value={data.lastName}
+                onChange={handleChange}
+                inputProps={{ className: "my-font" }}
+                InputLabelProps={{ className: "my-font" }}
+              />
+              <FormHelperText
+                error
+                style={{
+                  textAlign: "right",
+                  fontSize: "small",
+                  fontWeight: "bold",
+                }}
+              >
+                {state.lastNameErrorText}
+              </FormHelperText>
 
-          <LoadingButton
-            loading={state.isUpdating}
-            loadingPosition="start"
-            variant="contained"
-            style={{ marginTop: "2rem", marginRight: "1rem" }}
-            color="success"
-            startIcon={<SaveIcon />}
-            type="submit"
-            className="my-font"
-          >
-            Lưu thay đổi
-          </LoadingButton>
+              <LoadingButton
+                loading={state.isUpdating}
+                loadingPosition="start"
+                variant="contained"
+                style={{ marginTop: "2rem", marginRight: "1rem" }}
+                color="success"
+                startIcon={<SaveIcon />}
+                type="submit"
+                className="my-font"
+              >
+                Lưu thay đổi
+              </LoadingButton>
 
-          <Button
-            variant="outlined"
-            color="success"
-            style={{ marginTop: "2rem" }}
-            onClick={handleCancel}
-            className="my-font"
-          >
-            Hủy
-          </Button>
-        </form>
+              <Button
+                variant="outlined"
+                color="success"
+                style={{ marginTop: "2rem" }}
+                onClick={handleCancel}
+                className="my-font"
+              >
+                Hủy
+              </Button>
+            </form>
+          )}
+        </>
       )}
     </>
   );
