@@ -28,11 +28,10 @@ export default function AccountMenu() {
 
   function handleLogout() {
     let temp = {
-      email: null,
-      password: null,
       accessToken: null,
       tokenType: null,
       loggedIn: false,
+      isAdmin: false
     };
     localStorage.setItem("auth", JSON.stringify(temp));
     setAuth(temp);

@@ -107,7 +107,7 @@ function Learn() {
                           }}
                           color="#ff6f00"
                         >
-                          <b>Điểm: {set.score ?? "chưa thi"}</b>
+                          <b>Điểm: {set.score ? Math.round(set.score) : "chưa thi"}</b>
                         </Typography>
                       </CardContent>
                       <CardActions>

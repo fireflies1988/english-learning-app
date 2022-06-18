@@ -8,7 +8,8 @@ export function AuthProvider({ children }) {
   const [auth, setAuth] = useState({
     accessToken: null,
     tokenType: null,
-    loggedIn: false
+    loggedIn: false,
+    isAdmin: false,
   });
 
   return (

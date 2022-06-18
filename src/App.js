@@ -16,19 +16,21 @@ import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Password from "./pages/Password";
 import Test from "./pages/Test";
+import axios from "axios";
 
 function App() {
   const { auth, setAuth } = useContext(AuthContext);
   const loggedIn = useMemo(
-    () => JSON.parse(localStorage.getItem("auth"))?.loggedIn);
+    () => JSON.parse(localStorage.getItem("auth"))?.loggedIn
+  );
 
   useEffect(() => {
     let temp = localStorage.getItem("auth");
     if (temp != null) {
       setAuth(JSON.parse(temp));
     }
+    console.log(auth);
   }, []);
-  console.log(auth);
 
   return (
     <Router className="App">

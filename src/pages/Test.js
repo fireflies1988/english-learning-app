@@ -305,7 +305,7 @@ function Test() {
     }));
     try {
       const response = await axios.post(
-        `https://salty-earth-78071.herokuapp.com//score/new`,
+        `https://salty-earth-78071.herokuapp.com/score/new`,
         {
           setid: setId,
           score: (numOfCorrectAnswers / questions.length) * 100,

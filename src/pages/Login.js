@@ -75,11 +75,30 @@ function Login() {
       if (response.data.accessToken != null) {
         const accessToken = response.data.accessToken;
         const tokenType = response.data.tokenType;
+        
+        // get role
+        try {
+          const response = await axios.get(
+            "https://salty-earth-78071.herokuapp.com/user/get",
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: tokenType + " " + accessToken,
+              },
+            }
+          );
+          var isAdmin = response.data?.roleid?.name === "Admin" ? true : false;
+        } catch (err) {
+          console.log(err);
+        }
+
         let temp = {
           accessToken: accessToken,
           tokenType: tokenType,
           loggedIn: true,
+          isAdmin: isAdmin ?? false
         };
+        console.log(temp);
         localStorage.setItem("auth", JSON.stringify(temp));
         setAuth(temp);
       } else {
