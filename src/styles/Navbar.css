@@ -76,6 +76,7 @@ footer.bottom-nav {
   -webkit-box-pack: space-evenly;
       -ms-flex-pack: space-evenly;
           justify-content: space-evenly;
+  z-index: 1;
 }
 
 footer.bottom-nav a {

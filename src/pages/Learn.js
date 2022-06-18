@@ -55,7 +55,7 @@ function Learn() {
   }, [auth]);
 
   return (
-    <Container maxWidth="md" style={{ marginTop: "2rem" }}>
+    <Container maxWidth="md" style={{ marginTop: "2rem", marginBottom: "80px" }}>
       {state.errorMessage !== "" && (
         <Alert variant="standard" severity="error">
           {state.errorMessage}

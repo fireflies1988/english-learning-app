@@ -54,6 +54,7 @@ footer.bottom-nav {
     padding-bottom: 1rem;
     display: flex;
     justify-content: space-evenly;
+    z-index: 1;
 
     a {
         display: flex;

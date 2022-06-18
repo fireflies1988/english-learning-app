@@ -51,15 +51,15 @@ function Dictionary() {
     <div className="dictionary">
       <h2>Từ điển Anh - Việt</h2>
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} class="dict-form">
         <TextField
           type="search"
           id="standard-basic"
           label="Nhập từ cần tra"
+          className="search-input"
           variant="standard"
-          style={{ width: "36vw" }}
           inputRef={inputWordRef}
-          inputProps={{className: "my-font"}}
+          inputProps={{ className: "my-font" }}
           InputLabelProps={{ className: "my-font" }}
         />
 
@@ -69,45 +69,47 @@ function Dictionary() {
           variant="contained"
           color="success"
           type="submit"
-          style={{ width: "130px" }}
-          className="my-font"
+          // style={{ width: "130px" }}
+          className="my-font search-button"
         >
           Tìm kiếm
         </LoadingButton>
       </form>
 
-      <h3 hidden={firstLookUp}>
+      <h3 hidden={firstLookUp} style={{ textAlign: "center" }}>
         Kết quả tìm kiếm cho "{inputWordRef.current.value}"
       </h3>
       {data ? (
         <>
-          <div className="result">
-            <div class="phonetics">
-              <div>
-                <IconButton
-                  aria-label="speaker"
-                  onClick={() => playAudio(audio)}
-                >
-                  <VolumeUpIcon />
-                </IconButton>
+          <div style={{ maxWidth: "600px", width: "100%" }}>
+            <div className="result">
+              <div class="phonetics">
+                <div>
+                  <IconButton
+                    aria-label="speaker"
+                    onClick={() => playAudio(audio)}
+                  >
+                    <VolumeUpIcon />
+                  </IconButton>
 
-                <span>{data.result.ipa}</span>
+                  <span>{data.result.ipa}</span>
+                </div>
+
+                <IconButton aria-label="favorites">
+                  <StarBorderIcon />
+                </IconButton>
               </div>
 
-              <IconButton aria-label="favorites">
-                <StarBorderIcon />
-              </IconButton>
-            </div>
-
-            {data.result.meanings.length > 0 &&
-              data.result.meanings.map((meaning) => (
-                <div className="meaning" key={meaning.id}>
-                  <div style={{ marginBottom: "0.5rem" }}>
-                    <b>{meaning.typeid.name}</b>
+              {data.result.meanings.length > 0 &&
+                data.result.meanings.map((meaning) => (
+                  <div className="meaning" key={meaning.id}>
+                    <div style={{ marginBottom: "0.5rem" }}>
+                      <b>{meaning.typeid.name}</b>
+                    </div>
+                    <div>{meaning.mean}</div>
                   </div>
-                  <div>{meaning.mean}</div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
         </>
       ) : (
