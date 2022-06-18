@@ -17,7 +17,7 @@ import {
   ToggleButtonGroup,
 } from "@mui/material";
 import { Box } from "@mui/system";
-import React, { memo, useEffect, useMemo, useState } from "react";
+import React, { memo, useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import CloseIcon from "@mui/icons-material/Close";
 import "../styles/Test.css";
@@ -26,6 +26,7 @@ import "../styles/speech-bubble.css";
 import axios from "axios";
 import { useSpeechSynthesis } from "react-speech-kit";
 import EmojiFlagsIcon from "@mui/icons-material/EmojiFlags";
+import AuthContext from "../context/AuthProvider";
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 13,
@@ -63,7 +64,7 @@ const WordPicking = memo(
             disabled: false,
           })
         ),
-      []
+      [currentQuestion]
     );
 
     useEffect(() => {
@@ -73,7 +74,7 @@ const WordPicking = memo(
     return (
       <div className="word-picking">
         {currentQuestion.answer &&
-          shuffledWords.map((word) => (
+          shuffledWords?.map((word) => (
             <ToggleButton
               key={word.key}
               value={word.value}
@@ -91,23 +92,35 @@ const WordPicking = memo(
 );
 
 function Test() {
+  const { auth } = useContext(AuthContext);
+  const { speak } = useSpeechSynthesis();
   const { setId } = useParams();
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
-  const [option, setOption] = useState();
   const [state, setState] = useState({
     isLoading: true,
     loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
     errorMessage: "",
   });
+  // question
   const [questions, setQuestions] = useState();
   const [currentQuestion, setCurrentQuestion] = useState();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [numOfCorrectAnswers, setNumOfCorrectAnswers] = useState(0);
+
+  // word arranging question
   const [pickedWords, setPickedWords] = useState([]);
   const [shuffledWords, setShuffledWords] = useState([]);
-  const { speak } = useSpeechSynthesis();
+
+  // multiple choice question
+  const [option, setOption] = useState();
+
+  // listening question
+  const [yourListeningAnswer, setYourListeningAnswer] = useState("");
+
   // this state has one of four values: unanswered, correct, incorrect, completed
-  const [footerState, setFooterState] = useState("incorrect");
+  const [footerState, setFooterState] = useState("unanswered");
+  const [correctAnswer, setCorrectAnswer] = useState("");
 
   async function fetchQuestions() {
     try {
@@ -120,7 +133,7 @@ function Test() {
         }
       );
       setQuestions(() => response.data.result);
-      setCurrentQuestion(() => response.data.result[4]);
+      setCurrentQuestion(() => response.data.result[0]);
     } catch (err) {
       setState((state) => ({
         ...state,
@@ -137,11 +150,10 @@ function Test() {
     fetchQuestions();
   }, []);
 
-  /// multiple choice question
+  // multiple choice question
   const handleChange = (event, option) => {
     setOption(option);
   };
-  ///
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -161,14 +173,13 @@ function Test() {
     ]);
 
     // add the button to the answer section
-    setPickedWords((yourAnswer) => [...yourAnswer, word]);
+    setPickedWords((pickedWords) => [...pickedWords, word]);
   }
-
   function handleDeselectWord(word, index) {
     // remove the button from the answer section after clicking
-    setPickedWords((yourAnswer) => [
-      ...yourAnswer.slice(0, index),
-      ...yourAnswer.slice(index + 1),
+    setPickedWords((pickedWords) => [
+      ...pickedWords.slice(0, index),
+      ...pickedWords.slice(index + 1),
     ]);
 
     // enable the button in the choosing section after clicking
@@ -178,7 +189,147 @@ function Test() {
       ...shuffledWords.slice(word.key + 1),
     ]);
   }
-  ///
+
+  function checkAnswer() {
+    let questionType = currentQuestion.typeid.name;
+    if (questionType === "Listening") {
+      console.log("---Listening question---");
+      setCorrectAnswer(currentQuestion.questcontent);
+      if (!yourListeningAnswer) {
+        setFooterState("incorrect");
+      } else {
+        let words = currentQuestion.questcontent
+          .toLowerCase()
+          .trim()
+          .split(/\s+/);
+        console.info(words);
+        let yourWords = yourListeningAnswer.toLowerCase().trim().split(/\s+/);
+        console.info(yourWords);
+
+        let maxNumOfMatchedWords = Math.max(words.length, yourWords.length);
+        let numOfMatchedWords = 0;
+        for (let i = 0; i < Math.min(words.length, yourWords.length); i++) {
+          let maxNumOfMatchedChars = Math.max(
+            words[i].length,
+            yourWords[i].length
+          );
+          let numOfMatchedChars = 0;
+          for (
+            let j = 0;
+            j < Math.min(words[i].length, yourWords[i].length);
+            j++
+          ) {
+            if (words[i].charAt(j) === yourWords[i].charAt(j)) {
+              numOfMatchedChars++;
+            }
+          }
+
+          // check if the pair of words approximately matched
+          let rate = numOfMatchedChars / maxNumOfMatchedChars;
+          console.log("checkAnswer: " + rate);
+          if (rate > 0.7) {
+            numOfMatchedWords++;
+          }
+        }
+
+        let rate = numOfMatchedWords / maxNumOfMatchedWords;
+        console.log("checkAnswer - result: " + rate);
+        if (rate > 0.7) {
+          setFooterState("correct");
+          setNumOfCorrectAnswers((score) => score + 1);
+        } else {
+          setFooterState("incorrect");
+        }
+      }
+    } else if (questionType === "Reading") {
+      console.log("---Multiple question---");
+      setCorrectAnswer(currentQuestion.answer);
+      if (option?.toLowerCase() === currentQuestion.answer.toLowerCase()) {
+        setFooterState("correct");
+        setNumOfCorrectAnswers((score) => score + 1);
+      } else {
+        setFooterState("incorrect");
+      }
+    } else if (questionType === "Arrange") {
+      console.log("---Multiple question---");
+      setCorrectAnswer(currentQuestion.answer);
+      let yourAnswer = pickedWords.map((pw) => pw.value).join(" ");
+      console.log(yourAnswer);
+      let answer = currentQuestion.answer.trim().replaceAll(/\s+/g, " ");
+      console.log(answer);
+
+      if (yourAnswer === answer) {
+        setFooterState("correct");
+        setNumOfCorrectAnswers(
+          (numOfCorrectAnswers) => numOfCorrectAnswers + 1
+        );
+      } else {
+        setFooterState("incorrect");
+      }
+    }
+  }
+  console.log("Number of correct answers: " + numOfCorrectAnswers);
+  console.log("Index: " + currentIndex);
+
+  function dismiss() {
+    let questionType = currentQuestion.typeid.name;
+    if (questionType === "Listening") {
+      setCorrectAnswer(currentQuestion.questcontent);
+    } else {
+      setCorrectAnswer(currentQuestion.answer);
+    }
+    setFooterState("incorrect");
+  }
+
+  function handleClickContinue() {
+    // reset states
+    setYourListeningAnswer("");
+    setPickedWords([]);
+    setOption();
+
+    if (currentIndex + 1 < questions.length) {
+      setFooterState("unanswered");
+      setCurrentQuestion(questions[currentIndex + 1]);
+      setCurrentIndex((currentIndex) => currentIndex + 1);
+    } else {
+      setFooterState("completed");
+      updateScore();
+    }
+  }
+
+  async function updateScore() {
+    setState((state) => ({
+      ...state,
+      isLoading: true,
+      loadingText: "Đang tính điểm, vui lòng chờ...",
+    }));
+    try {
+      const response = await axios.post(
+        `https://salty-earth-78071.herokuapp.com//score/new`,
+        {
+          setid: setId,
+          score: (numOfCorrectAnswers / questions.length) * 100,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: auth.tokenType + " " + auth.accessToken,
+          },
+        }
+      );
+      console.log(response.data);
+    } catch (err) {
+      setState((state) => ({
+        ...state,
+        errorMessage: "Đã có lỗi xảy ra, vui lòng thử lại sau!\n" + err,
+      }));
+    }
+    setState((state) => ({
+      ...state,
+      isLoading: false,
+      loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
+    }));
+  }
 
   return (
     <Container maxWidth="md" style={{ marginTop: "2rem" }} className="my-font">
@@ -303,6 +454,8 @@ function Test() {
                         style={{ marginTop: "3rem" }}
                         inputProps={{ className: "my-font" }}
                         InputLabelProps={{ className: "my-font" }}
+                        value={yourListeningAnswer}
+                        onChange={(e) => setYourListeningAnswer(e.target.value)}
                       />
                     </section>
 
@@ -369,8 +522,19 @@ function Test() {
                       >
                         Xin chúc mừng bạn đã hoàn thành bài học
                       </h2>
+                      <h3
+                        style={{
+                          textAlign: "center",
+                          color: "#ffc400",
+                          marginBottom: "0",
+                        }}
+                      >
+                        Bạn trả lời đúng: {numOfCorrectAnswers}/
+                        {questions.length}
+                      </h3>
                       <h3 style={{ textAlign: "center", color: "#ffc400" }}>
-                        Điểm của bạn: 10
+                        Điểm của bạn:{" "}
+                        {(numOfCorrectAnswers / questions.length) * 100}
                       </h3>
                     </div>
                   </section>
@@ -396,6 +560,7 @@ function Test() {
                       variant="outlined"
                       color="success"
                       className="my-font continue-button"
+                      onClick={dismiss}
                     >
                       Bỏ qua
                     </Button>
@@ -403,6 +568,7 @@ function Test() {
                       variant="contained"
                       color="success"
                       className="my-font continue-button"
+                      onClick={checkAnswer}
                     >
                       Kiểm tra
                     </Button>
@@ -421,7 +587,7 @@ function Test() {
                       <div className="answer-content">
                         <div className="group-1">
                           <h3>Đáp án đúng là:</h3>
-                          <div>The answer</div>
+                          <div>{correctAnswer}</div>
                         </div>
 
                         <Button
@@ -438,6 +604,7 @@ function Test() {
                       variant="contained"
                       color="error"
                       className="my-font continue-button"
+                      onClick={handleClickContinue}
                     >
                       Tiếp tục
                     </Button>
@@ -453,7 +620,7 @@ function Test() {
                       <div className="answer-content">
                         <div className="group-1" style={{ color: "#2e7d32" }}>
                           <h3>Đúng rồi, giỏi lắm!</h3>
-                          <div>The answer</div>
+                          <div>{correctAnswer}</div>
                         </div>
 
                         <Button
@@ -470,6 +637,7 @@ function Test() {
                       variant="contained"
                       color="success"
                       className="my-font continue-button"
+                      onClick={handleClickContinue}
                     >
                       Tiếp tục
                     </Button>
@@ -481,6 +649,7 @@ function Test() {
                       variant="contained"
                       color="success"
                       className="my-font continue-button"
+                      onClick={() => navigate("learn")}
                     >
                       Tiếp tục
                     </Button>
