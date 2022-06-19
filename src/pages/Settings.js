@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Link, Outlet } from "react-router-dom";
+import AuthContext from "../context/AuthProvider";
 import "../styles/Settings.css";
 
 function Settings() {
   const [tab, setTab] = useState("profile");
+  const { auth } = useContext(AuthContext);
 
   useEffect(() => {
-    let lastSegment = window.location.href.substring(window.location.href.lastIndexOf('/') + 1);
+    let lastSegment = window.location.href.substring(
+      window.location.href.lastIndexOf("/") + 1
+    );
     if (lastSegment === "" || lastSegment === "settings") {
       setTab("profile");
     } else {
@@ -32,6 +36,15 @@ function Settings() {
           >
             Mật khẩu
           </Link>
+          {auth.isAdmin === true && (
+            <Link
+              to="admin/questions"
+              className={`tab${tab === "questions" ? " active" : ""}`}
+              onClick={() => setTab("questions")}
+            >
+              Quản trị đề thi
+            </Link>
+          )}
           <Link
             to=""
             className={`tab${tab === "deleteAccount" ? " active" : ""}`}

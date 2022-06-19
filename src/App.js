@@ -16,7 +16,7 @@ import Settings from "./pages/Settings";
 import Profile from "./pages/Profile";
 import Password from "./pages/Password";
 import Test from "./pages/Test";
-import axios from "axios";
+import QuestionAdmin from "./pages/QuestionAdmin";
 
 function App() {
   const { auth, setAuth } = useContext(AuthContext);
@@ -51,6 +51,7 @@ function App() {
               <Route index element={<Profile />} />
               <Route path="profile" element={<Profile />} />
               <Route path="password" element={<Password />} />
+              <Route path="admin/questions" element={<QuestionAdmin />} />
               <Route path="*" element={<Navigate to="profile" />} />
             </Route>
             <Route path="*" element={<Navigate to="learn" />} />
