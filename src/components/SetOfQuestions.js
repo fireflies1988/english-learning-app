@@ -1,99 +1,174 @@
+import LoadingButton from "@mui/lab/LoadingButton";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
-  Alert,
-  CircularProgress,
-  Typography,
+  Button,
+  Grid,
+  TextField,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
-import Question from "./Question";
+import React, { useContext, useState } from "react";
+import { useSnackbar } from "notistack";
+import AuthContext from "../context/AuthProvider";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import Questions from "./Questions";
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import axios from "axios";
 
-function SetOfQuestions({ setId }) {
-  const [questions, setQuestions] = useState();
-  const [state, setState] = useState({
-    isLoading: true,
-    loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
-    errorMessage: "",
-  });
+function SetOfQuestions({ set, setsOfQuestions, setSetsOfQuestions, index }) {
+  const { auth } = useContext(AuthContext);
+  const [expanded, setExpanded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [initialData, setInitialData] = useState(set);
+  const [data, setData] = useState(set);
+  const { enqueueSnackbar } = useSnackbar();
 
-  async function fetchQuestions() {
+  function handleClickVariant(variant, message) {
+    // variant could be success, error, warning, info, or default
+    enqueueSnackbar(message, {
+      variant,
+      anchorOrigin: {
+        horizontal: "right",
+        vertical: "bottom",
+      },
+      className: "my-font",
+    });
+  }
+
+  async function updateSetOfQuestions({ id, name }) {
+    setSaving((saving) => !saving);
     try {
-      const response = await axios.get(
-        `https://salty-earth-78071.herokuapp.com/question/getbyset?set=${setId}`,
+      const response = await axios.post(
+        "https://salty-earth-78071.herokuapp.com/setofquestion/update",
+        {
+          name: name,
+          id: id,
+        },
         {
           headers: {
             "Content-Type": "application/json",
+            Authorization: auth.tokenType + " " + auth.accessToken,
           },
         }
       );
-      setQuestions(() => response.data.result);
+
+      if (response.data.status === 200) {
+        setData(() => response.data.result);
+        setInitialData(() => response.data.result);
+        handleClickVariant("success", "Lưu thay đổi thành công");
+      }
     } catch (err) {
-      setState((state) => ({
-        ...state,
-        errorMessage: "Đã có lỗi xảy ra, vui lòng thử lại sau!\n" + err,
-      }));
+      handleClickVariant("error", "Lưu thất bại, đã có lỗi xảy ra: " + err);
     }
-    setState((state) => ({
-      ...state,
-      isLoading: false,
-    }));
+    setSaving((saving) => !saving);
   }
 
-  useEffect(() => {
-    fetchQuestions();
-  }, []);
+  async function deleteSetOfQuestions() {
+    setDeleting((deleting) => !deleting);
+    try {
+      const response = await axios.delete(
+        "https://salty-earth-78071.herokuapp.com/setofquestion/",
+        {
+          id: set.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: auth.tokenType + " " + auth.accessToken,
+          },
+        }
+      );
+
+      if (response.data.status === 200) {
+        setSetsOfQuestions((setsOfQuestions) => [
+          ...setsOfQuestions.slice(0, index),
+          ...setsOfQuestions.slice(index + 1),
+        ]);
+        handleClickVariant("success", "Xóa bộ đề thành công");
+      }
+    } catch (err) {
+      handleClickVariant("error", "Xóa bộ đề thất bại: " + err);
+    }
+    setDeleting((deleting) => !deleting);
+  }
 
   return (
-    <>
-      {state.errorMessage !== "" && (
-        <Alert variant="standard" severity="error">
-          {state.errorMessage}
-        </Alert>
-      )}
-
-      {state.isLoading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            height: "150px",
-            flexDirection: "column",
-          }}
-        >
-          <div style={{ display: "flex", justifyContent: "center" }}>
-            <CircularProgress color="success" />
-          </div>
-          <h4 style={{ textAlign: "center" }}>{state.loadingText}</h4>
-        </div>
-      ) : (
-        <>
-          {!state.errorMessage && (
-            <>
-              {questions?.length > 0 ? (
-                questions?.map((question, index) => (
-                  <Accordion>
-                    <AccordionSummary
-                      expandIcon={<ExpandMoreIcon />}
-                      aria-controls="panel1a-content"
-                      id="panel1a-header"
-                    >
-                      <Typography className="my-font">Câu hỏi {index + 1}</Typography>
-                    </AccordionSummary>
-                    <AccordionDetails>
-                      <Question question={question} />
-                    </AccordionDetails>
-                  </Accordion>
-                ))) : (
-                    <h3>Đề này chưa có câu hỏi nào!</h3>
-                )}
-            </>
-          )}
-        </>
-      )}
-    </>
+    <Accordion expanded={expanded}>
+      <AccordionSummary
+        expandIcon={
+          <ExpandMoreIcon
+            onClick={() => setExpanded((expanded) => !expanded)}
+          />
+        }
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <Grid container spacing={1} style={{ marginRight: "0.5rem" }}>
+          <Grid item xs={12} md={8}>
+            <TextField
+              placeholder="Nhập tên bộ đề"
+              value={data.name}
+              onChange={(e) => setData({ ...data, name: e.target.value })}
+              size="small"
+              variant="outlined"
+              fullWidth
+              inputProps={{ className: "my-font" }}
+            />
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            md={4}
+            style={{ display: "flex", alignItems: "center" }}
+          >
+            <LoadingButton
+              loading={saving}
+              onClick={() => updateSetOfQuestions(data)}
+              loadingPosition="start"
+              startIcon={<SaveIcon />}
+              variant="contained"
+              color="success"
+              className="my-font"
+              size="small"
+              sx={{ width: "33.33%" }}
+            >
+              Lưu
+            </LoadingButton>
+            <LoadingButton
+              loading={deleting}
+              onClick={deleteSetOfQuestions}
+              loadingPosition="start"
+              startIcon={<DeleteIcon />}
+              variant="contained"
+              color="error"
+              sx={{ marginLeft: "0.25rem", width: "33.33%" }}
+              className="my-font"
+              size="small"
+            >
+              Xóa
+            </LoadingButton>
+            <LoadingButton
+              loadingPosition="start"
+              startIcon={<DoDisturbIcon />}
+              variant="outlined"
+              color="success"
+              sx={{ marginLeft: "0.25rem", width: "33.33%" }}
+              className="my-font"
+              size="small"
+              onClick={() => setData(initialData)}
+            >
+              Hủy
+            </LoadingButton>
+          </Grid>
+        </Grid>
+      </AccordionSummary>
+      <AccordionDetails>
+        <Questions setId={set.id} />
+      </AccordionDetails>
+    </Accordion>
   );
 }
 

@@ -53,7 +53,7 @@ function Settings() {
             Xóa tài khoản
           </Link>
         </div>
-        <div class="tab-content" style={{ marginBottom: "70px" }}>
+        <div className="tab-content" style={{ marginBottom: "70px" }}>
           <Outlet />
         </div>
       </div>

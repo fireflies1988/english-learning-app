@@ -56,7 +56,7 @@ function Navbar() {
       {/* render the current route selected here */}
       <Outlet />
 
-      <footer class="bottom-nav">
+      <footer className="bottom-nav">
         <Link to="/learn" onClick={() => setPage("learn")}>
           <img src={page === "learn" ? focusLearnIcon : learnIcon} alt="" />
           &nbsp;&nbsp;
