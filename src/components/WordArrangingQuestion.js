@@ -1,7 +1,13 @@
 import { TextField } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 
-function WordArrangingQuestion() {
+function WordArrangingQuestion({ question }) {
+  const [updatedQuestion, setUpdatedQuestion] = useState(question);
+  function handleChange(event) {
+    const { name, value } = event.target;
+    setUpdatedQuestion({ ...updatedQuestion, [name]: value });
+  }
+
   return (
     <>
       <TextField
@@ -9,9 +15,9 @@ function WordArrangingQuestion() {
         type="text"
         id=""
         label="Nội dung câu hỏi"
-        name="content"
-        // value={}
-        // onChange={}
+        name="questcontent"
+        value={updatedQuestion.questcontent}
+        onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
         size="small"
@@ -21,9 +27,9 @@ function WordArrangingQuestion() {
         type="text"
         id=""
         label="Đáp án"
-        name="Answer"
-        // value={}
-        // onChange={}
+        name="answer"
+        value={updatedQuestion.answer}
+        onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
         size="small"

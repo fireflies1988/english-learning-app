@@ -1,9 +1,11 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useSnackbar } from "notistack";
 import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Alert,
+  CircularProgress,
   Grid,
   TextField,
   Typography,
@@ -16,7 +18,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Question from "../components/Question";
 import AuthContext from "../context/AuthProvider";
 import axios from "axios";
-import DoDisturbIcon from '@mui/icons-material/DoDisturb';
+import DoDisturbIcon from "@mui/icons-material/DoDisturb";
+import SetOfQuestions from "../components/SetOfQuestions";
 
 function QuestionAdmin() {
   const { auth } = useContext(AuthContext);
@@ -30,8 +33,9 @@ function QuestionAdmin() {
     loadingText: "Đang lấy dữ liệu, vui lòng chờ...",
   });
   const { enqueueSnackbar } = useSnackbar();
-  const [expand, setExpand] = useState(false);
+  const [expand, setExpand] = useState();
   const [setsOfQuestions, setSetsOfQuestions] = useState();
+  const [nestedExpand, setNestedExpand] = useState();
 
   const handleClickVariant = (variant) => () => {
     // variant could be success, error, warning, info, or default
@@ -45,10 +49,10 @@ function QuestionAdmin() {
     });
   };
 
-  async function fetchSetsOfQuestions() {
+  async function fetchAllSetsOfQuestions() {
     try {
       const response = await axios.get(
-        "https://salty-earth-78071.herokuapp.com/setofquestion/get",
+        "https://salty-earth-78071.herokuapp.com/setofquestion/all",
         {
           headers: {
             "Content-Type": "application/json",
@@ -69,107 +73,147 @@ function QuestionAdmin() {
     }));
   }
 
+  useEffect(() => {
+    if (auth.accessToken) {
+      fetchAllSetsOfQuestions();
+    }
+  }, [auth]);
+
   return (
     <>
       <h1 style={{ marginTop: "0px", color: "#3c3c3c" }}>Quản trị đề thi</h1>
 
-      <Accordion expanded={expand}>
-        <AccordionSummary
-          expandIcon={
-            <ExpandMoreIcon onClick={() => setExpand((prev) => !prev)} />
-          }
-          aria-controls="panel1a-content"
-          id="panel1a-header"
+      {state.errorMessage !== "" && (
+        <Alert variant="standard" severity="error">
+          {state.errorMessage}
+        </Alert>
+      )}
+
+      {state.isLoading ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            height: "75vh",
+            flexDirection: "column",
+          }}
         >
-          <Grid container spacing={1} style={{ marginRight: "0.5rem" }}>
-            <Grid item xs={12} md={8}>
-              <TextField
-                placeholder="Nhập tên bộ đề"
-                id="standard-set-input"
-                size="small"
-                variant="outlined"
+          <div style={{ display: "flex", justifyContent: "center" }}>
+            <CircularProgress color="success" />
+          </div>
+          <h4 style={{ textAlign: "center" }}>{state.loadingText}</h4>
+        </div>
+      ) : (
+        <>
+          {!state.errorMessage && (
+            <>
+              {setsOfQuestions?.length > 0 &&
+                setsOfQuestions.map((set) => (
+                  <Accordion expanded={expand === set.id} key={set.id}>
+                    <AccordionSummary
+                      expandIcon={
+                        <ExpandMoreIcon
+                          onClick={() =>
+                            setExpand(expand === set.id ? "" : set.id)
+                          }
+                        />
+                      }
+                      aria-controls="panel1a-content"
+                      id="panel1a-header"
+                    >
+                      <Grid
+                        container
+                        spacing={1}
+                        style={{ marginRight: "0.5rem" }}
+                      >
+                        <Grid item xs={12} md={8}>
+                          <TextField
+                            placeholder="Nhập tên bộ đề"
+                            id={set.id}
+                            value={set.name}
+                            size="small"
+                            variant="outlined"
+                            fullWidth
+                            inputProps={{ className: "my-font" }}
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          xs={12}
+                          md={4}
+                          style={{ display: "flex", alignItems: "center" }}
+                        >
+                          <LoadingButton
+                            loadingPosition="start"
+                            startIcon={<SaveIcon />}
+                            variant="contained"
+                            color="success"
+                            className="my-font"
+                            size="small"
+                            sx={{ width: "33.33%" }}
+                          >
+                            Lưu
+                          </LoadingButton>
+                          <LoadingButton
+                            loadingPosition="start"
+                            startIcon={<DeleteIcon />}
+                            variant="contained"
+                            color="error"
+                            sx={{ marginLeft: "0.25rem", width: "33.33%" }}
+                            className="my-font"
+                            size="small"
+                          >
+                            Xóa
+                          </LoadingButton>
+                          <LoadingButton
+                            loadingPosition="start"
+                            startIcon={<DoDisturbIcon />}
+                            variant="outlined"
+                            color="success"
+                            sx={{ marginLeft: "0.25rem", width: "33.33%" }}
+                            className="my-font"
+                            size="small"
+                          >
+                            Hủy
+                          </LoadingButton>
+                        </Grid>
+                      </Grid>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                      <SetOfQuestions setId={set.id} />
+
+                      <LoadingButton
+                        loading={state.isCreating}
+                        loadingPosition="start"
+                        variant="contained"
+                        style={{ margin: "1rem 0 0 0" }}
+                        color="success"
+                        startIcon={<AddIcon />}
+                        size="small"
+                        className="my-font"
+                      >
+                        Thêm câu hỏi
+                      </LoadingButton>
+                    </AccordionDetails>
+                  </Accordion>
+                ))}
+
+              <LoadingButton
+                loading={state.isCreating}
+                loadingPosition="start"
+                variant="contained"
+                style={{ margin: "1rem 0 0" }}
+                color="success"
+                startIcon={<AddIcon />}
+                className="my-font"
                 fullWidth
-                inputProps={{ className: "my-font" }}
-              />
-            </Grid>
-            <Grid item xs={12} md={4} style={{ display: "flex", alignItems: "center" }}>
-              <LoadingButton
-                loadingPosition="start"
-                startIcon={<SaveIcon />}
-                variant="contained"
-                color="success"
-                className="my-font"
-                size="small"
-                sx={{ width: "33.33%" }}
               >
-                Lưu
+                Thêm bộ đề
               </LoadingButton>
-              <LoadingButton
-                loadingPosition="start"
-                startIcon={<DeleteIcon />}
-                variant="contained"
-                color="error"
-                sx={{ marginLeft: "0.25rem", width: "33.33%" }}
-                className="my-font"
-                size="small"
-              >
-                Xóa
-              </LoadingButton>
-              <LoadingButton
-                loadingPosition="start"
-                startIcon={<DoDisturbIcon />}
-                variant="outlined"
-                color="success"
-                sx={{ marginLeft: "0.25rem", width: "33.33%" }}
-                className="my-font"
-                size="small"
-              >
-                Hủy
-              </LoadingButton>
-            </Grid>
-          </Grid>
-        </AccordionSummary>
-        <AccordionDetails>
-          <Accordion>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography className="my-font">Câu hỏi 1</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Question questionType="" />
-            </AccordionDetails>
-          </Accordion>
-
-          <LoadingButton
-            loading={state.isCreating}
-            loadingPosition="start"
-            variant="contained"
-            style={{ margin: "1rem 0 0 0" }}
-            color="success"
-            startIcon={<AddIcon />}
-            size="small"
-            className="my-font"
-          >
-            Thêm câu hỏi
-          </LoadingButton>
-        </AccordionDetails>
-      </Accordion>
-
-      <LoadingButton
-        loading={state.isCreating}
-        loadingPosition="start"
-        variant="contained"
-        style={{ margin: "1rem 0 0" }}
-        color="success"
-        startIcon={<AddIcon />}
-        className="my-font"
-        fullWidth
-      >
-        Thêm bộ đề
-      </LoadingButton>
+            </>
+          )}
+        </>
+      )}
     </>
   );
 }

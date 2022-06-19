@@ -8,10 +8,9 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import ListeningQuestion from './ListeningQuestion';
 import WordArrangingQuestion from './WordArrangingQuestion';
 
-function Question(props) {
-    // Reading, Listening, WordArranging
-    const [questionType, setQuestionType] = useState(props.questionType);
-    const [question, setQuestion] = useState();
+function Question({ question }) {
+    // Reading, Listening, Arrange, Default
+    const [questionType, setQuestionType] = useState(question?.typeid?.name);
   
     return (
       <>
@@ -28,13 +27,13 @@ function Question(props) {
           >
             <MenuItem value="Reading" className="my-font">Trắc nghiệm</MenuItem>
             <MenuItem value="Listening" className="my-font">Nghe</MenuItem>
-            <MenuItem value="WordArranging" className="my-font">Sắp xếp từ</MenuItem>
+            <MenuItem value="Arrange" className="my-font">Sắp xếp từ</MenuItem>
           </Select>
         </FormControl>
   
-        {questionType === "Reading" && <MultipleChoiceQuestion />}
-        {questionType === "Listening" && <ListeningQuestion /> }
-        {questionType === "WordArranging" && <WordArrangingQuestion />}
+        {questionType === "Reading" && <MultipleChoiceQuestion question={question} />}
+        {questionType === "Listening" && <ListeningQuestion question={question} /> }
+        {questionType === "Arrange" && <WordArrangingQuestion question={question} />}
 
         <LoadingButton
           loadingPosition="start"
