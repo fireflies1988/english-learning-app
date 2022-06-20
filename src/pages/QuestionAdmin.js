@@ -62,7 +62,7 @@ function QuestionAdmin() {
       const response = await axios.post(
         "https://salty-earth-78071.herokuapp.com/setofquestion/new",
         {
-          name: "This is default name",
+          name: "",
         },
         {
           headers: {
@@ -78,9 +78,11 @@ function QuestionAdmin() {
           response.data.result,
         ]);
         handleClickVariant("success", "Thêm bộ đề thành công");
+      } else {
+        handleClickVariant("error", "Thêm bộ đề thất bại");
       }
     } catch (err) {
-      handleClickVariant("error", "Thêm thất bại: " + err);
+      handleClickVariant("error", "Thêm bộ đề thất bại: " + err);
     }
     setCreating((creating) => !creating);
   }
@@ -124,7 +126,6 @@ function QuestionAdmin() {
                   <SetOfQuestions
                     set={set}
                     key={set.id}
-                    setsOfQuestions={setsOfQuestions}
                     setSetsOfQuestions={setSetsOfQuestions}
                     index={index}
                   />

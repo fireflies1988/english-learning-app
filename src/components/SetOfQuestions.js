@@ -17,7 +17,7 @@ import Questions from "./Questions";
 import DoDisturbIcon from "@mui/icons-material/DoDisturb";
 import axios from "axios";
 
-function SetOfQuestions({ set, setsOfQuestions, setSetsOfQuestions, index }) {
+function SetOfQuestions({ set, setSetsOfQuestions, index }) {
   const { auth } = useContext(AuthContext);
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -59,6 +59,8 @@ function SetOfQuestions({ set, setsOfQuestions, setSetsOfQuestions, index }) {
         setData(() => response.data.result);
         setInitialData(() => response.data.result);
         handleClickVariant("success", "Lưu thay đổi thành công");
+      } else {
+        handleClickVariant("error", "Lưu thất bại")
       }
     } catch (err) {
       handleClickVariant("error", "Lưu thất bại, đã có lỗi xảy ra: " + err);
@@ -72,12 +74,12 @@ function SetOfQuestions({ set, setsOfQuestions, setSetsOfQuestions, index }) {
       const response = await axios.delete(
         "https://salty-earth-78071.herokuapp.com/setofquestion/",
         {
-          id: set.id,
-        },
-        {
           headers: {
             "Content-Type": "application/json",
             Authorization: auth.tokenType + " " + auth.accessToken,
+          },
+          data: {
+            id: set.id,
           },
         }
       );
@@ -88,6 +90,8 @@ function SetOfQuestions({ set, setsOfQuestions, setSetsOfQuestions, index }) {
           ...setsOfQuestions.slice(index + 1),
         ]);
         handleClickVariant("success", "Xóa bộ đề thành công");
+      } else {
+        handleClickVariant("error", "Xóa bộ đề thất bại");
       }
     } catch (err) {
       handleClickVariant("error", "Xóa bộ đề thất bại: " + err);

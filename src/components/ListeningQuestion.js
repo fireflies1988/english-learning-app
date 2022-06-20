@@ -1,11 +1,10 @@
 import { TextField } from "@mui/material";
 import React, { useState } from "react";
 
-function ListeningQuestion({ question }) {
-  const [updatedQuestion, setUpdatedQuestion] = useState(question);
+function ListeningQuestion({ question, setQuestion }) {
   function handleChange(event) {
     const { name, value } = event.target;
-    setUpdatedQuestion({ ...updatedQuestion, [name]: value });
+    setQuestion({ ...question, [name]: value });
   }
 
   return (
@@ -15,7 +14,7 @@ function ListeningQuestion({ question }) {
       id=""
       label="Nội dung nghe"
       name="questcontent"
-      value={updatedQuestion.questcontent}
+      value={question.questcontent}
       onChange={handleChange}
       inputProps={{ className: "my-font" }}
       InputLabelProps={{ className: "my-font" }}

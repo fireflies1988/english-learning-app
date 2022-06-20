@@ -1,11 +1,10 @@
 import { TextField } from "@mui/material";
 import React, { useState } from "react";
 
-function MultipleChoiceQuestion({ question }) {
-  const [updatedQuestion, setUpdatedQuestion] = useState(question);
+function MultipleChoiceQuestion({ question, setQuestion }) {
   function handleChange(event) {
     const { name, value } = event.target;
-    setUpdatedQuestion({ ...updatedQuestion, [name]: value });
+    setQuestion({ ...question, [name]: value });
   }
 
   return (
@@ -16,7 +15,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="Nội dung câu hỏi"
         name="questcontent"
-        value={updatedQuestion.questcontent}
+        value={question.questcontent}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
@@ -28,7 +27,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="A"
         name="a"
-        value={updatedQuestion.a}
+        value={question.a}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
@@ -40,7 +39,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="B"
         name="b"
-        value={updatedQuestion.b}
+        value={question.b}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
@@ -52,7 +51,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="C"
         name="c"
-        value={updatedQuestion.c}
+        value={question.c}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
@@ -64,7 +63,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="D"
         name="d"
-        value={updatedQuestion.d}
+        value={question.d}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
@@ -76,7 +75,7 @@ function MultipleChoiceQuestion({ question }) {
         id=""
         label="Đáp án"
         name="answer"
-        value={updatedQuestion.answer}
+        value={question.answer}
         onChange={handleChange}
         inputProps={{ className: "my-font" }}
         InputLabelProps={{ className: "my-font" }}
