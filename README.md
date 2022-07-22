@@ -9,6 +9,9 @@ An english learning app for Vietnamese people. It's a fake version of Duolingoï¼
 
 ## Techologies used
   React
+  
+## API Documentation (Author: Hoang Duc Thuan)
+https://docs.google.com/document/d/1GqpqenKibfO2IeM8nQb2UnYVDrXJ9Nit/edit?fbclid=IwAR3rSaivKiwkBxFquRYN0pxzXuoDASrm2tExSnYe5pK-NZEPrP3t5J_zVYs
 
 ## Admin account
   * Email: a@gmail.com
