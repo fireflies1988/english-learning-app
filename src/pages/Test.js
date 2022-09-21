@@ -308,7 +308,7 @@ function Test() {
         `https://salty-earth-78071.herokuapp.com/score/new`,
         {
           setid: setId,
-          score: (numOfCorrectAnswers / questions.length) * 100,
+          score: (numOfCorrectAnswers / questions?.length) * 100,
         },
         {
           headers: {
@@ -530,11 +530,11 @@ function Test() {
                         }}
                       >
                         Bạn trả lời đúng: {numOfCorrectAnswers}/
-                        {questions.length}
+                        {questions?.length}
                       </h3>
                       <h3 style={{ textAlign: "center", color: "#ffc400" }}>
                         Điểm của bạn:{" "}
-                        {(numOfCorrectAnswers / questions.length) * 100}
+                        {(numOfCorrectAnswers / questions?.length) * 100}
                       </h3>
                     </div>
                   </section>

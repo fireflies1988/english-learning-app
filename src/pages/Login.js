@@ -1,23 +1,16 @@
-import React, { useContext, useEffect } from "react";
-import { useState } from "react";
-import "../styles/Login.css";
-import { Link, useLocation } from "react-router-dom";
-import {
-  TextField,
-  FormControl,
-  InputLabel,
-  OutlinedInput,
-  InputAdornment,
-  IconButton,
-  FormHelperText,
-  Alert,
-} from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import axios from "axios";
-import AuthContext from "../context/AuthProvider";
 import LoadingButton from "@mui/lab/LoadingButton";
+import {
+  Alert, FormControl, FormHelperText, IconButton, InputAdornment, InputLabel,
+  OutlinedInput, TextField
+} from "@mui/material";
+import axios from "axios";
 import { createBrowserHistory } from "history";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import AuthContext from "../context/AuthProvider";
+import "../styles/Login.css";
 
 function Login() {
   const history = createBrowserHistory();

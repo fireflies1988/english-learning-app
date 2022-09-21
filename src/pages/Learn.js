@@ -16,7 +16,7 @@ import { useNavigate } from "react-router-dom";
 
 function Learn() {
   const navigate = useNavigate();
-  const { auth } = useContext(AuthContext);
+  const { auth, setAuth } = useContext(AuthContext);
   const [data, setData] = useState();
   const [state, setState] = useState({
     isLoading: true,
@@ -35,7 +35,20 @@ function Learn() {
           },
         }
       );
-      setData(response.data.result);
+      console.log(response);
+      if (response.status === 200) {
+        setData(response.data.result);
+      } else {
+        // logout
+        let temp = {
+          accessToken: null,
+          tokenType: null,
+          loggedIn: false,
+          isAdmin: false
+        };
+        localStorage.setItem("auth", JSON.stringify(temp));
+        setAuth(temp);
+      }
     } catch (err) {
       setState((state) => ({
         ...state,
@@ -80,7 +93,7 @@ function Learn() {
         <>
           {!state.errorMessage && (
             <Grid container spacing={2}>
-              {data.length > 0 &&
+              {data?.length > 0 &&
                 data.map((set) => (
                   <Grid item xs={6} md={4} key={set.id}>
                     <Card

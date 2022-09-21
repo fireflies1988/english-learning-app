@@ -100,8 +100,8 @@ function Dictionary() {
                 </IconButton>
               </div>
 
-              {data.result.meanings.length > 0 &&
-                data.result.meanings.map((meaning) => (
+              {data?.result?.meanings?.length > 0 &&
+                data?.result?.meanings?.map((meaning) => (
                   <div className="meaning" key={meaning.id}>
                     <div style={{ marginBottom: "0.5rem" }}>
                       <b>{meaning.typeid.name}</b>
